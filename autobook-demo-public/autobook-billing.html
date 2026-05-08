@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AutoBook AI — Billing & Subscription</title>
+<style>
+/* ══ TOKENS ══ */
+:root{
+  --brand:#6366f1;--brand-dk:#4f46e5;--brand-lt:#eef2ff;--brand-pale:#f5f3ff;
+  --grad:linear-gradient(135deg,#6366f1,#8b5cf6);
+  --ok:#10b981;--warn:#f59e0b;--err:#ef4444;--sky:#3b82f6;--pink:#ec4899;
+  --dark:#0d1117;--d2:#161b22;--d3:#21262d;
+  --bg:#f8fafc;--card:#fff;--bd:#e2e8f0;--bd2:#f1f5f9;
+  --tx:#0f172a;--tx2:#334155;--mu:#64748b;--li:#94a3b8;
+  --r:14px;--rs:9px;
+  --sh:0 1px 3px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.05);
+  --shm:0 4px 24px rgba(0,0,0,.09),0 12px 40px rgba(0,0,0,.07);
+  --shx:0 12px 48px rgba(0,0,0,.16),0 32px 80px rgba(0,0,0,.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);-webkit-font-smoothing:antialiased;min-height:100vh}
+a{text-decoration:none;color:inherit}
+button,input,select{font-family:inherit}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#c7d2fe;border-radius:4px}
+
+/* ══ TOP NAV ══ */
+.topnav{height:58px;background:rgba(255,255,255,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 5%;position:sticky;top:0;z-index:200;gap:14px}
+.nav-logo{display:flex;align-items:center;gap:8px}
+.nav-logo-i{width:30px;height:30px;border-radius:8px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff}
+.nav-logo-n{font-size:15px;font-weight:900;letter-spacing:-.4px}
+.nav-logo-n span{color:var(--brand)}
+.nav-divider{width:1px;height:16px;background:var(--bd)}
+.nav-crumb{font-size:13px;color:var(--mu)}
+.nav-space{flex:1}
+.nav-btns{display:flex;align-items:center;gap:10px}
+.nav-user{display:flex;align-items:center;gap:8px;padding:6px 12px;background:var(--bg);border-radius:var(--rs);border:1px solid var(--bd);cursor:pointer;font-size:13px;color:var(--tx2);font-weight:500;transition:all .2s}
+.nav-user:hover{border-color:var(--brand);color:var(--brand)}
+.nav-av{width:28px;height:28px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff}
+
+/* ══ PAGE LAYOUT ══ */
+.page-wrap{max-width:1120px;margin:0 auto;padding:36px 5%}
+.page-title{font-size:24px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px}
+.page-sub{font-size:14px;color:var(--mu)}
+
+/* ══ SECTION ══ */
+.section{margin-bottom:40px}
+.section-title{font-size:16px;font-weight:800;letter-spacing:-.3px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+
+/* ══ CARDS ══ */
+.card{background:var(--card);border-radius:var(--r);border:1px solid var(--bd);box-shadow:var(--sh);overflow:hidden}
+.card-p{padding:22px}
+.card-hd{padding:18px 22px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.card-hd-title{font-size:14px;font-weight:700}
+.card-hd-sub{font-size:12px;color:var(--mu);margin-top:2px}
+
+/* ══ BADGES ══ */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.b-green{background:#d1fae5;color:#065f46}
+.b-blue{background:#dbeafe;color:#1e40af}
+.b-purple{background:#ede9fe;color:#5b21b6}
+.b-yellow{background:#fef3c7;color:#92400e}
+.b-red{background:#fee2e2;color:#991b1b}
+.b-gray{background:#f1f5f9;color:#475569}
+.b-gradient{background:var(--grad);color:#fff;border:none}
+
+/* ══ BUTTONS ══ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 20px;border-radius:var(--rs);font-size:13.5px;font-weight:700;border:none;cursor:pointer;transition:all .2s;white-space:nowrap;text-decoration:none}
+.btn-p{background:var(--grad);color:#fff;box-shadow:0 3px 14px rgba(99,102,241,.3)}
+.btn-p:hover{filter:brightness(1.08);transform:translateY(-1px);box-shadow:0 5px 22px rgba(99,102,241,.4)}
+.btn-o{background:transparent;border:1.5px solid var(--bd);color:var(--tx2)}
+.btn-o:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-lt)}
+.btn-ghost{background:transparent;color:var(--mu);border:none}
+.btn-ghost:hover{background:var(--bg);color:var(--tx)}
+.btn-danger{background:var(--err);color:#fff}
+.btn-danger:hover{filter:brightness(1.08)}
+.btn-dark{background:var(--tx);color:#fff}
+.btn-dark:hover{background:var(--tx2)}
+.btn-sm{padding:6px 13px;font-size:12px;border-radius:7px}
+.btn-xs{padding:4px 10px;font-size:11px;border-radius:6px}
+.btn-lg{padding:13px 28px;font-size:15px;border-radius:11px}
+.btn:disabled{opacity:.55;cursor:not-allowed;transform:none!important}
+.btn-loading{position:relative;color:transparent!important}
+.btn-loading::after{content:'';position:absolute;width:16px;height:16px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ══ BILLING TOGGLE ══ */
+.billing-toggle-wrap{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:44px}
+.billing-toggle{display:flex;align-items:center;gap:4px;background:#fff;padding:4px;border-radius:11px;border:1.5px solid var(--bd);box-shadow:var(--sh)}
+.btgl{padding:8px 20px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;transition:all .2s;background:transparent;color:var(--mu)}
+.btgl.on{background:var(--grad);color:#fff;box-shadow:0 2px 10px rgba(99,102,241,.3)}
+.save-badge{background:linear-gradient(135deg,#10b981,#059669);color:#fff;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;box-shadow:0 2px 8px rgba(16,185,129,.3)}
+
+/* ══ PRICING CARDS ══ */
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;max-width:980px;margin:0 auto;align-items:stretch}
+.plan-card{background:var(--card);border:1.5px solid var(--bd);padding:32px 26px;display:flex;flex-direction:column;position:relative;transition:transform .3s,box-shadow .3s}
+.plan-card:first-child{border-radius:20px 0 0 20px}
+.plan-card:last-child{border-radius:0 20px 20px 0}
+.plan-card.current{outline:2px solid var(--ok);outline-offset:-2px}
+.plan-card.popular{background:var(--dark);border-color:transparent;border-radius:20px;z-index:2;box-shadow:0 20px 60px rgba(99,102,241,.4);transform:scale(1.03);transform-origin:center center}
+.popular-pill{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#f59e0b,#ef4444);color:#fff;padding:5px 20px;border-radius:20px;font-size:11.5px;font-weight:800;white-space:nowrap;box-shadow:0 3px 12px rgba(245,158,11,.4);display:flex;align-items:center;gap:6px}
+.plan-tier{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--mu);margin-bottom:8px}
+.plan-card.popular .plan-tier{color:rgba(255,255,255,.45)}
+.plan-name{font-size:22px;font-weight:900;margin-bottom:5px}
+.plan-card.popular .plan-name{color:#fff}
+.plan-price-row{display:flex;align-items:baseline;gap:4px;margin-bottom:3px}
+.plan-price{font-size:50px;font-weight:900;letter-spacing:-2.5px;color:var(--tx);line-height:1;transition:all .4s}
+.plan-card.popular .plan-price{color:#fff}
+.plan-per{font-size:14px;color:var(--mu);font-weight:500}
+.plan-card.popular .plan-per{color:rgba(255,255,255,.5)}
+.plan-billed{font-size:12px;color:var(--mu);margin-bottom:12px;height:16px;transition:all .3s}
+.plan-card.popular .plan-billed{color:rgba(255,255,255,.45)}
+.plan-desc{font-size:13px;color:var(--mu);line-height:1.65;margin-bottom:20px}
+.plan-card.popular .plan-desc{color:rgba(255,255,255,.6)}
+.plan-btn{width:100%;padding:12px;border-radius:10px;font-size:14px;font-weight:800;border:none;cursor:pointer;transition:all .2s;margin-bottom:8px}
+.plan-btn-current{background:#d1fae5;color:#065f46;cursor:default}
+.plan-btn-primary{background:var(--grad);color:#fff;box-shadow:0 3px 14px rgba(99,102,241,.3)}
+.plan-btn-primary:hover{filter:brightness(1.08)}
+.plan-btn-white{background:#fff;color:var(--brand);box-shadow:0 2px 10px rgba(0,0,0,.12)}
+.plan-btn-white:hover{box-shadow:0 4px 18px rgba(0,0,0,.18)}
+.plan-btn-outline{background:transparent;border:1.5px solid var(--bd);color:var(--tx)}
+.plan-btn-outline:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-lt)}
+.plan-btn-dark{background:var(--tx);color:#fff}
+.plan-btn-dark:hover{background:var(--tx2)}
+.plan-trial{text-align:center;font-size:11.5px;color:rgba(255,255,255,.35);margin-bottom:16px;height:17px}
+.plan-trial.light{color:var(--mu)}
+.plan-divider{height:1px;background:var(--bd);margin:16px 0}
+.plan-card.popular .plan-divider{background:rgba(255,255,255,.12)}
+.plan-feats{display:flex;flex-direction:column;gap:10px;flex:1}
+.plan-feat{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--tx2)}
+.plan-card.popular .plan-feat{color:rgba(255,255,255,.85)}
+.plan-feat.dim{opacity:.4}
+.pf-icon{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;margin-top:2px}
+.pf-ok{background:#d1fae5;color:#065f46}
+.pf-grad{background:rgba(255,255,255,.18);color:#fff}
+.pf-gold{background:#fef3c7;color:#92400e}
+.pf-no{background:#f1f5f9;color:var(--li)}
+
+/* ══ CURRENT PLAN BANNER ══ */
+.current-plan-banner{background:linear-gradient(135deg,#0f172a,#1e1b4b);border-radius:var(--r);padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:36px}
+.cpb-left{}
+.cpb-label{font-size:12px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.cpb-plan{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.cpb-plan-name{font-size:22px;font-weight:900;color:#fff}
+.cpb-plan-badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700}
+.cpb-next{font-size:13px;color:rgba(255,255,255,.5)}
+.cpb-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.cpb-stat{text-align:center;padding:14px 18px;background:rgba(255,255,255,.06);border-radius:10px;border:1px solid rgba(255,255,255,.08)}
+.cpb-stat-val{font-size:22px;font-weight:900;color:#fff}
+.cpb-stat-lbl{font-size:11px;color:rgba(255,255,255,.4);margin-top:3px}
+
+/* ══ STRIPE CHECKOUT MODAL ══ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-overlay.show{opacity:1;pointer-events:auto}
+.modal{background:#fff;border-radius:20px;width:100%;max-width:900px;box-shadow:0 32px 120px rgba(0,0,0,.3);display:flex;overflow:hidden;animation:modalIn .35s cubic-bezier(.34,1.2,.64,1)}
+@keyframes modalIn{from{transform:scale(.94) translateY(16px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.modal-left{width:340px;flex-shrink:0;background:var(--dark);padding:36px 32px;display:flex;flex-direction:column}
+.modal-right{flex:1;padding:36px 32px;overflow-y:auto;max-height:88vh}
+
+.checkout-logo{display:flex;align-items:center;gap:9px;margin-bottom:36px}
+.checkout-logo-i{width:34px;height:34px;border-radius:9px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#fff}
+.checkout-logo-n{font-size:16px;font-weight:900;color:#fff;letter-spacing:-.4px}
+.checkout-logo-n span{color:#a5b4fc}
+
+.checkout-plan-name{font-size:13px;font-weight:700;color:rgba(255,255,255,.45);margin-bottom:6px}
+.checkout-amount{font-size:44px;font-weight:900;color:#fff;letter-spacing:-2px;line-height:1;margin-bottom:4px}
+.checkout-billing-cycle{font-size:13px;color:rgba(255,255,255,.45);margin-bottom:28px}
+.checkout-line-items{display:flex;flex-direction:column;gap:0;margin-bottom:24px}
+.cli{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:13px}
+.cli:last-child{border-bottom:none}
+.cli-label{color:rgba(255,255,255,.55)}
+.cli-val{color:#fff;font-weight:600}
+.cli.total{padding-top:14px;margin-top:6px;border-top:1px solid rgba(255,255,255,.12);border-bottom:none}
+.cli.total .cli-label{color:rgba(255,255,255,.8);font-weight:700}
+.cli.total .cli-val{font-size:15px;font-weight:900;color:#fff}
+
+.checkout-features{display:flex;flex-direction:column;gap:8px;margin-top:auto}
+.checkout-feat{display:flex;align-items:center;gap:8px;font-size:12.5px;color:rgba(255,255,255,.5)}
+.checkout-feat-icon{width:18px;height:18px;border-radius:50%;background:rgba(16,185,129,.2);display:flex;align-items:center;justify-content:center;font-size:9px;color:#6ee7b7;flex-shrink:0}
+
+.checkout-title{font-size:20px;font-weight:900;letter-spacing:-.4px;color:var(--tx);margin-bottom:6px}
+.checkout-sub{font-size:13px;color:var(--mu);margin-bottom:24px}
+
+/* Form */
+.stripe-field-group{margin-bottom:18px}
+.stripe-label{font-size:12.5px;font-weight:700;color:var(--tx2);display:block;margin-bottom:6px}
+.stripe-input{width:100%;padding:11px 13px;border:1.5px solid var(--bd);border-radius:var(--rs);font-size:14px;outline:none;transition:border .2s,box-shadow .2s;background:#fff;color:var(--tx);font-family:inherit}
+.stripe-input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(99,102,241,.1)}
+.stripe-input.err{border-color:var(--err);box-shadow:0 0 0 3px rgba(239,68,68,.09)}
+.stripe-input.ok{border-color:var(--ok)}
+.stripe-input::placeholder{color:var(--li)}
+.field-err{font-size:12px;color:var(--err);margin-top:4px;display:none}
+.field-err.show{display:block}
+.stripe-row{display:grid;grid-template-columns:2fr 1fr;gap:12px}
+.card-num-wrap{position:relative}
+.card-brand-icon{position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:18px;pointer-events:none}
+.stripe-secure{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--mu);margin-bottom:18px}
+.powered-by{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--li);margin-top:16px;justify-content:center}
+.stripe-logo{font-size:15px;font-weight:900;color:#635BFF;letter-spacing:-.5px}
+
+.modal-close{position:absolute;top:16px;right:16px;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.07);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--mu);transition:background .2s}
+.modal-close:hover{background:rgba(0,0,0,.12)}
+
+/* ══ SUCCESS OVERLAY ══ */
+.success-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9100;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .3s}
+.success-overlay.show{opacity:1;pointer-events:auto}
+.success-box{background:#fff;border-radius:20px;padding:48px 44px;max-width:520px;width:100%;text-align:center;box-shadow:0 32px 100px rgba(0,0,0,.3);animation:modalIn .4s cubic-bezier(.34,1.2,.64,1)}
+.success-ring{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#10b981,#059669);display:flex;align-items:center;justify-content:center;margin:0 auto 22px;font-size:34px;box-shadow:0 6px 24px rgba(16,185,129,.4);animation:pop .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop{from{transform:scale(0) rotate(-20deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+.success-h{font-size:26px;font-weight:900;letter-spacing:-.6px;margin-bottom:10px}
+.success-p{font-size:14px;color:var(--mu);line-height:1.7;margin-bottom:28px}
+.success-details{background:var(--bg);border-radius:12px;padding:16px 20px;margin-bottom:24px;text-align:left}
+.sd-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bd);font-size:13px}
+.sd-row:last-child{border-bottom:none}
+.sd-l{color:var(--mu)}
+.sd-v{font-weight:700;color:var(--tx)}
+.confetti-burst{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+
+/* ══ FAILED PAYMENT MODAL ══ */
+.failed-box{background:#fff;border-radius:20px;padding:40px;max-width:480px;width:100%;text-align:center;box-shadow:0 32px 100px rgba(0,0,0,.3)}
+.failed-icon{width:72px;height:72px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:30px}
+.failed-h{font-size:22px;font-weight:900;margin-bottom:8px;color:var(--tx)}
+.failed-p{font-size:13.5px;color:var(--mu);line-height:1.7;margin-bottom:20px}
+.failed-reasons{background:#fff5f5;border:1px solid #fecaca;border-radius:10px;padding:14px 16px;margin-bottom:22px;text-align:left}
+.fr-title{font-size:12px;font-weight:700;color:var(--err);margin-bottom:8px}
+.fr-item{font-size:12.5px;color:var(--tx2);margin-bottom:5px;display:flex;align-items:center;gap:7px}
+
+/* ══ BILLING HISTORY ══ */
+.invoice-row{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--bd2);transition:background .15s}
+.invoice-row:last-child{border-bottom:none}
+.invoice-row:hover{background:var(--bg)}
+.inv-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.inv-info{flex:1}
+.inv-name{font-size:13.5px;font-weight:700}
+.inv-date{font-size:12px;color:var(--mu);margin-top:2px}
+.inv-amount{font-size:14px;font-weight:800;color:var(--tx);min-width:60px;text-align:right}
+
+/* ══ PAYMENT METHOD CARD ══ */
+.pm-card{display:flex;align-items:center;gap:14px;padding:16px 18px;background:var(--bg);border-radius:11px;border:1.5px solid var(--bd);cursor:pointer;transition:all .2s}
+.pm-card:hover{border-color:var(--brand);background:var(--brand-lt)}
+.pm-card.selected{border-color:var(--brand);background:var(--brand-lt);box-shadow:0 0 0 3px rgba(99,102,241,.1)}
+.pm-brand{font-size:24px}
+.pm-info{flex:1}
+.pm-num{font-size:14px;font-weight:700}
+.pm-exp{font-size:12px;color:var(--mu)}
+.pm-default{font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:#d1fae5;color:#065f46}
+
+/* ══ USAGE METER ══ */
+.usage-bar{height:8px;background:var(--bd);border-radius:8px;overflow:hidden;margin:8px 0}
+.usage-fill{height:100%;border-radius:8px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+
+/* ══ GRID ══ */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.flex{display:flex}.aic{align-items:center}.jb{justify-content:space-between}.f1{flex:1}.g8{gap:8px}.g10{gap:10px}.g12{gap:12px}.g16{gap:16px}
+.mt4{margin-top:4px}.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}.mt24{margin-top:24px}
+.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}
+.tsm{font-size:13px}.txs{font-size:11.5px}.tmut{color:var(--mu)}.tbold{font-weight:700}.tc{text-align:center}
+.divider{height:1px;background:var(--bd);margin:16px 0}
+.w100{width:100%}
+
+/* ══ ALERT ══ */
+.alert{padding:12px 15px;border-radius:var(--rs);font-size:13px;display:flex;align-items:flex-start;gap:9px;line-height:1.55;margin-bottom:16px}
+.alert-warn{background:#fffbeb;border:1px solid #fde68a;color:#92400e}
+.alert-err{background:#fff1f1;border:1px solid #fecaca;color:#991b1b}
+.alert-ok{background:#f0fdf4;border:1px solid #bbf7d0;color:#065f46}
+.alert-info{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af}
+
+/* ══ DOWNGRADE CONFIRM ══ */
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:8900;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .25s}
+.confirm-overlay.show{opacity:1;pointer-events:auto}
+.confirm-box{background:#fff;border-radius:16px;padding:32px;max-width:440px;width:100%;box-shadow:var(--shx)}
+.confirm-icon{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px}
+.confirm-h{font-size:18px;font-weight:800;margin-bottom:8px}
+.confirm-p{font-size:13.5px;color:var(--mu);line-height:1.65;margin-bottom:20px}
+.confirm-btns{display:flex;gap:10px}
+
+/* ══ RESPONSIVE ══ */
+@media(max-width:900px){
+  .plans-grid{grid-template-columns:1fr}
+  .plan-card:first-child,.plan-card:last-child,.plan-card.popular{border-radius:var(--r);transform:none;margin:0}
+  .modal{flex-direction:column;max-height:90vh;overflow-y:auto}
+  .modal-left{width:100%;padding:24px}
+  .modal-right{padding:24px}
+  .cpb-stats{grid-template-columns:1fr 1fr}
+  .g2,.g3{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .page-wrap{padding:24px 16px}
+  .billing-toggle-wrap{flex-direction:column;gap:10px}
+  .topnav{padding:0 16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ TOP NAV ══ -->
+<nav class="topnav">
+  <div class="nav-logo" style="cursor:pointer" onclick="window.location.href='autobook-ai.html'">
+    <div class="nav-logo-i">A</div>
+    <div class="nav-logo-n">AutoBook<span> AI</span></div>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-crumb">Plans &amp; Billing</div>
+  <div class="nav-space"></div>
+  <div class="nav-btns">
+    <button class="btn btn-o btn-sm" onclick="window.location.href='autobook-ai.html'">← Dashboard</button>
+    <div class="nav-user" onclick="window.location.href='autobook-ai.html'">
+      <div class="nav-av" id="nav-av">NP</div>
+      <span id="nav-name">Natalie Park</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ MAIN ══ -->
+<div class="page-wrap">
+
+  <!-- PAGE HEADER -->
+  <div class="flex aic jb mb20" style="flex-wrap:wrap;gap:12px">
+    <div>
+      <div class="page-title">Plans &amp; Billing</div>
+      <div class="page-sub">Manage your AutoBook AI subscription, payment methods, and billing history.</div>
+    </div>
+    <div class="flex g10">
+      <button class="btn btn-o btn-sm" onclick="showSection('billing-history')">📄 Invoices</button>
+      <button class="btn btn-p btn-sm" onclick="scrollTo(0,0)">⚡ Upgrade Plan</button>
+    </div>
+  </div>
+
+  <!-- CURRENT PLAN BANNER -->
+  <div class="current-plan-banner mb20">
+    <div class="cpb-left">
+      <div class="cpb-label">Current Plan</div>
+      <div class="cpb-plan">
+        <div class="cpb-plan-name" id="cpb-name">Growth</div>
+        <span class="badge b-gradient" id="cpb-badge">● Active</span>
+      </div>
+      <div class="cpb-next" id="cpb-next">Next billing: June 8, 2025 · $149.00</div>
+    </div>
+    <div class="cpb-stats">
+      <div class="cpb-stat"><div class="cpb-stat-val" id="cpb-bookings">∞</div><div class="cpb-stat-lbl">Bookings/mo</div></div>
+      <div class="cpb-stat"><div class="cpb-stat-val" id="cpb-ai">96%</div><div class="cpb-stat-lbl">AI Response</div></div>
+      <div class="cpb-stat"><div class="cpb-stat-val" id="cpb-since">May 8</div><div class="cpb-stat-lbl">Member Since</div></div>
+    </div>
+  </div>
+
+  <!-- FAILED PAYMENT ALERT -->
+  <div class="alert alert-err mb20" id="failed-alert" style="display:none">
+    <span style="font-size:18px;flex-shrink:0">⚠️</span>
+    <div>
+      <strong>Payment failed</strong> — Your last payment was declined. Please update your payment method to keep your subscription active.
+      <button onclick="openCheckout(state.currentPlan,'retry')" style="margin-left:10px;padding:4px 12px;background:var(--err);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer">Update Payment →</button>
+    </div>
+  </div>
+
+  <!-- SECTION: CHOOSE PLAN -->
+  <div class="section" id="section-plans">
+    <div class="section-title">
+      <span>💎</span> Choose Your Plan
+      <span id="current-plan-pill" class="badge b-green" style="margin-left:4px;font-size:10.5px"></span>
+    </div>
+
+    <!-- BILLING TOGGLE -->
+    <div class="billing-toggle-wrap">
+      <div class="billing-toggle">
+        <button class="btgl on" id="btgl-m" onclick="setBilling('monthly')">Monthly</button>
+        <button class="btgl" id="btgl-a" onclick="setBilling('annual')">Annual</button>
+      </div>
+      <div class="save-badge" id="save-badge" style="opacity:0;transition:opacity .3s">🎉 Save up to $720/year</div>
+    </div>
+
+    <!-- PLAN CARDS -->
+    <div class="plans-grid" id="plans-grid">
+
+      <!-- STARTER -->
+      <div class="plan-card" id="card-starter">
+        <div class="plan-tier">🌱 For Solo Businesses</div>
+        <div class="plan-name">Starter</div>
+        <div class="plan-price-row">
+          <span class="plan-price" id="price-starter">$49</span>
+          <span class="plan-per">/mo</span>
+        </div>
+        <div class="plan-billed" id="billed-starter">Billed monthly · cancel anytime</div>
+        <div class="plan-desc">Perfect for solo operators who want AI replies and automated booking without the complexity.</div>
+        <button class="plan-btn" id="btn-starter" onclick="handlePlanClick('starter')">Get Started</button>
+        <div class="plan-trial light">Free migration assistance included</div>
+        <div class="plan-divider"></div>
+        <div class="plan-feats">
+          <div class="plan-feat"><div class="pf-icon pf-ok">✓</div>AI replies to customers 24/7</div>
+          <div class="plan-feat"><div class="pf-icon pf-ok">✓</div>Booking requests via chat</div>
+          <div class="plan-feat"><div class="pf-icon pf-ok">✓</div>Email appointment reminders</div>
+          <div class="plan-feat"><div class="pf-icon pf-ok">✓</div>Up to 100 bookings/month</div>
+          <div class="plan-feat"><div class="pf-icon pf-ok">✓</div>Basic appointment calendar</div>
+          <div class="plan-feat"><div class="pf-icon pf-ok">✓</div>1 business location</div>
+          <div class="plan-feat dim"><div class="pf-icon pf-no">—</div>SMS reminders</div>
+          <div class="plan-feat dim"><div class="pf-icon pf-no">—</div>Analytics dashboard</div>
+          <div class="plan-feat dim"><div class="pf-icon pf-no">—</div>Customer management (CRM)</div>
+          <div class="plan-feat dim"><div class="pf-icon pf-no">—</div>Multiple locations</div>
+          <div class="plan-feat dim"><div class="pf-icon pf-no">—</div>Priority support</div>
+        </div>
+      </div>
+
+      <!-- GROWTH -->
+      <div class="plan-card popular" id="card-growth">
+        <div class="popular-pill">🔥 Most Popular</div>
+        <div class="plan-tier">🚀 For Growing Businesses</div>
+        <div class="plan-name">Growth</div>
+        <div class="plan-price-row">
+          <span class="plan-price" id="price-growth">$149</span>
+          <span class="plan-per">/mo</span>
+        </div>
+        <div class="plan-billed" id="billed-growth">Billed monthly · cancel anytime</div>
+        <div class="plan-desc">For growing businesses ready to automate their entire front desk and track real revenue impact.</div>
+        <button class="plan-btn plan-btn-white" id="btn-growth" onclick="handlePlanClick('growth')">Start Free Trial →</button>
+        <div class="plan-trial">14-day free trial · no credit card needed</div>
+        <div class="plan-divider"></div>
+        <div class="plan-feats">
+          <div class="plan-feat"><div class="pf-icon pf-grad">✓</div>Full AI Receptionist (Aria)</div>
+          <div class="plan-feat"><div class="pf-icon pf-grad">✓</div>SMS + Email follow-up reminders</div>
+          <div class="plan-feat"><div class="pf-icon pf-grad">✓</div>Analytics dashboard</div>
+          <div class="plan-feat"><div class="pf-icon pf-grad">✓</div>Customer management (CRM)</div>
+          <div class="plan-feat"><div class="pf-icon pf-grad">✓</div>Missed lead recovery</div>
+          <div class="plan-feat"><div class="pf-icon pf-grad">✓</div>Message templates library</div>
+          <div class="plan-feat"><div class="pf-icon pf-grad">✓</div>Unlimited bookings</div>
+          <div class="plan-feat"><div class="pf-icon pf-grad">✓</div>Review request automation</div>
+          <div class="plan-feat"><div class="pf-icon pf-grad">✓</div>Up to 3 team members</div>
+          <div class="plan-feat" style="color:rgba(255,255,255,.5)"><div class="pf-icon pf-no" style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.4)">—</div>Multiple locations</div>
+          <div class="plan-feat" style="color:rgba(255,255,255,.5)"><div class="pf-icon pf-no" style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.4)">—</div>Priority support</div>
+        </div>
+      </div>
+
+      <!-- PRO -->
+      <div class="plan-card" id="card-pro">
+        <div class="plan-tier">⚡ For Busy Businesses</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price-row">
+          <span class="plan-price" id="price-pro">$299</span>
+          <span class="plan-per">/mo</span>
+        </div>
+        <div class="plan-billed" id="billed-pro">Billed monthly · cancel anytime</div>
+        <div class="plan-desc">For high-volume businesses that need advanced automations, multiple locations, and full team control.</div>
+        <button class="plan-btn plan-btn-dark" id="btn-pro" onclick="handlePlanClick('pro')">Get Pro Access</button>
+        <div class="plan-trial light">Dedicated onboarding session included</div>
+        <div class="plan-divider"></div>
+        <div class="plan-feats">
+          <div class="plan-feat"><div class="pf-icon pf-gold">✓</div>Everything in Growth</div>
+          <div class="plan-feat"><div class="pf-icon pf-gold">✓</div>Advanced automations</div>
+          <div class="plan-feat"><div class="pf-icon pf-gold">✓</div>Multiple locations (unlimited)</div>
+          <div class="plan-feat"><div class="pf-icon pf-gold">✓</div>Unlimited team members</div>
+          <div class="plan-feat"><div class="pf-icon pf-gold">✓</div>Priority support (2hr SLA)</div>
+          <div class="plan-feat"><div class="pf-icon pf-gold">✓</div>Custom AI training</div>
+          <div class="plan-feat"><div class="pf-icon pf-gold">✓</div>White-label branding</div>
+          <div class="plan-feat"><div class="pf-icon pf-gold">✓</div>API access &amp; webhooks</div>
+          <div class="plan-feat"><div class="pf-icon pf-gold">✓</div>Dedicated account manager</div>
+          <div class="plan-feat"><div class="pf-icon pf-gold">✓</div>Advanced analytics &amp; exports</div>
+          <div class="plan-feat"><div class="pf-icon pf-gold">✓</div>Onboarding &amp; setup assistance</div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /plans -->
+
+  <!-- SECTION: USAGE -->
+  <div class="section">
+    <div class="section-title"><span>📊</span> Current Usage</div>
+    <div class="g3">
+      <div class="card card-p">
+        <div class="flex aic jb mb8"><span class="tsm tbold">Bookings This Month</span><span class="badge b-green" id="usage-bookings-badge">131 / ∞</span></div>
+        <div class="usage-bar"><div class="usage-fill" style="width:65%;background:var(--brand)"></div></div>
+        <div class="txs tmut mt4">131 bookings used · unlimited on Growth</div>
+      </div>
+      <div class="card card-p">
+        <div class="flex aic jb mb8"><span class="tsm tbold">AI Conversations</span><span class="badge b-purple">412 this month</span></div>
+        <div class="usage-bar"><div class="usage-fill" style="width:82%;background:#8b5cf6"></div></div>
+        <div class="txs tmut mt4">412 handled · avg 38s response time</div>
+      </div>
+      <div class="card card-p">
+        <div class="flex aic jb mb8"><span class="tsm tbold">SMS Reminders</span><span class="badge b-blue">131 sent</span></div>
+        <div class="usage-bar"><div class="usage-fill" style="width:55%;background:var(--sky)"></div></div>
+        <div class="txs tmut mt4">131 of unlimited · Growth plan</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: PAYMENT METHODS -->
+  <div class="section" id="section-payment">
+    <div class="section-title"><span>💳</span> Payment Methods</div>
+    <div class="g2">
+      <div>
+        <div class="pm-card selected mb12" id="pm-primary">
+          <div class="pm-brand">💳</div>
+          <div class="pm-info">
+            <div class="pm-num" id="pm-num">Visa ending in 4242</div>
+            <div class="pm-exp" id="pm-exp">Expires 12/27</div>
+          </div>
+          <div class="pm-default">Default</div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-o btn-sm" onclick="openCheckout(state.currentPlan,'update-card')">+ Add Payment Method</button>
+          <button class="btn btn-ghost btn-sm" onclick="openCheckout(state.currentPlan,'update-card')">✏️ Update Card</button>
+        </div>
+      </div>
+      <div class="card card-p">
+        <div class="section-title" style="font-size:14px;margin-bottom:12px"><span>🔒</span> Billing Security</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--tx2)"><span style="color:var(--ok)">✓</span>256-bit SSL encryption</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--tx2)"><span style="color:var(--ok)">✓</span>PCI DSS Level 1 compliant</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--tx2)"><span style="color:var(--ok)">✓</span>Powered by Stripe</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--tx2)"><span style="color:var(--ok)">✓</span>Card data never stored on our servers</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: BILLING HISTORY -->
+  <div class="section" id="billing-history">
+    <div class="section-title flex aic jb"><div class="flex aic g8"><span>📄</span> Billing History</div><button class="btn btn-o btn-sm">📥 Download All</button></div>
+    <div class="card">
+      <div style="padding:0 22px" id="invoice-list">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: DANGER ZONE -->
+  <div class="section">
+    <div class="section-title"><span>⚠️</span> Subscription Management</div>
+    <div class="card card-p">
+      <div class="g2" style="align-items:start">
+        <div>
+          <div style="font-size:14px;font-weight:700;margin-bottom:5px">Pause Subscription</div>
+          <div class="tsm tmut mb12">Pause your plan for up to 3 months. Your data and settings are preserved.</div>
+          <button class="btn btn-o btn-sm" onclick="showToast('⏸ Subscription pause requested. You\'ll receive a confirmation email.','warn')">Pause Plan</button>
+        </div>
+        <div style="border-left:1px solid var(--bd);padding-left:20px">
+          <div style="font-size:14px;font-weight:700;margin-bottom:5px;color:var(--err)">Cancel Subscription</div>
+          <div class="tsm tmut mb12">Cancel anytime. Your plan stays active until the end of your current billing period.</div>
+          <button class="btn btn-sm" style="background:#fee2e2;color:var(--err);border:1px solid #fecaca;font-weight:700" onclick="confirmCancel()">Cancel Plan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page-wrap -->
+
+
+<!-- ══ CHECKOUT MODAL ══ -->
+<div class="modal-overlay" id="checkout-modal">
+  <div class="modal" style="position:relative">
+    <button class="modal-close" onclick="closeCheckout()">✕</button>
+
+    <!-- LEFT: Order Summary -->
+    <div class="modal-left">
+      <div class="checkout-logo">
+        <div class="checkout-logo-i">A</div>
+        <div class="checkout-logo-n">AutoBook<span> AI</span></div>
+      </div>
+      <div class="checkout-plan-name" id="co-plan-label">Growth Plan</div>
+      <div class="checkout-amount" id="co-amount">$149</div>
+      <div class="checkout-billing-cycle" id="co-cycle">per month</div>
+      <div class="checkout-line-items">
+        <div class="cli"><span class="cli-label" id="co-line-plan">Growth Plan (monthly)</span><span class="cli-val" id="co-line-price">$149.00</span></div>
+        <div class="cli" id="co-line-discount" style="display:none"><span class="cli-label">Annual discount (20%)</span><span class="cli-val" style="color:#10b981" id="co-discount-val">−$357.60</span></div>
+        <div class="cli"><span class="cli-label">Tax</span><span class="cli-val">$0.00</span></div>
+        <div class="cli total"><span class="cli-label">Total due today</span><span class="cli-val" id="co-total">$149.00</span></div>
+      </div>
+      <div class="checkout-features">
+        <div class="checkout-feat"><div class="checkout-feat-icon">✓</div>Cancel or change plan anytime</div>
+        <div class="checkout-feat"><div class="checkout-feat-icon">✓</div>Prorated upgrade credits applied</div>
+        <div class="checkout-feat"><div class="checkout-feat-icon">✓</div>Receipt emailed immediately</div>
+        <div class="checkout-feat"><div class="checkout-feat-icon">✓</div>30-day money-back guarantee</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Payment Form -->
+    <div class="modal-right">
+      <div id="checkout-form-wrap">
+        <div class="checkout-title" id="co-form-title">Complete your subscription</div>
+        <div class="checkout-sub" id="co-form-sub">Enter your payment details below. You'll be charged after your free trial ends.</div>
+
+        <div class="alert alert-err" id="checkout-alert" style="display:none">
+          <span>⚠️</span><span id="checkout-alert-text">Payment failed. Please check your card details and try again.</span>
+        </div>
+
+        <!-- Email -->
+        <div class="stripe-field-group">
+          <label class="stripe-label">Email</label>
+          <input class="stripe-input ok" id="co-email" type="email" placeholder="you@business.com">
+        </div>
+
+        <!-- Name on card -->
+        <div class="stripe-field-group">
+          <label class="stripe-label">Name on card</label>
+          <input class="stripe-input" id="co-name" type="text" placeholder="Jamie Rivera" oninput="validateCardName(this)">
+          <div class="field-err" id="err-name">Please enter the name as it appears on your card</div>
+        </div>
+
+        <!-- Card Number -->
+        <div class="stripe-field-group">
+          <label class="stripe-label">Card number</label>
+          <div class="card-num-wrap">
+            <input class="stripe-input" id="co-card" type="text" placeholder="1234 1234 1234 1234" maxlength="19" oninput="formatCard(this)" onblur="validateCard(this)">
+            <span class="card-brand-icon" id="co-card-brand">💳</span>
+          </div>
+          <div class="field-err" id="err-card">Please enter a valid card number</div>
+        </div>
+
+        <!-- Expiry + CVC -->
+        <div class="stripe-row" style="margin-bottom:18px">
+          <div class="stripe-field-group" style="margin-bottom:0">
+            <label class="stripe-label">Expiration date</label>
+            <input class="stripe-input" id="co-exp" type="text" placeholder="MM / YY" maxlength="7" oninput="formatExpiry(this)" onblur="validateExpiry(this)">
+            <div class="field-err" id="err-exp">Invalid expiration date</div>
+          </div>
+          <div class="stripe-field-group" style="margin-bottom:0">
+            <label class="stripe-label">CVC</label>
+            <input class="stripe-input" id="co-cvc" type="text" placeholder="123" maxlength="4" oninput="this.value=this.value.replace(/\D/g,'')" onblur="validateCVC(this)">
+            <div class="field-err" id="err-cvc">Invalid CVC</div>
+          </div>
+        </div>
+
+        <!-- Billing ZIP -->
+        <div class="stripe-field-group">
+          <label class="stripe-label">Billing ZIP / Postal code</label>
+          <input class="stripe-input" id="co-zip" type="text" placeholder="90210" maxlength="10">
+        </div>
+
+        <!-- Secure badge -->
+        <div class="stripe-secure">
+          🔒 <span>Your payment info is encrypted and secure</span>
+        </div>
+
+        <!-- Submit -->
+        <button class="btn btn-p btn-lg w100" id="co-submit-btn" onclick="submitPayment()">
+          <span id="co-btn-text">Subscribe — $149/mo</span>
+        </button>
+
+        <div class="powered-by">
+          Secured by <span class="stripe-logo" style="margin-left:4px">stripe</span>
+          &nbsp;·&nbsp; 🔒 SSL &nbsp;·&nbsp; 🛡 PCI Compliant
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAYMENT SUCCESS ══ -->
+<div class="success-overlay" id="success-overlay">
+  <div class="success-box" style="position:relative">
+    <canvas id="confetti-canvas" style="position:absolute;inset:0;pointer-events:none;border-radius:20px"></canvas>
+    <div class="success-ring" id="success-ring">✓</div>
+    <h2 class="success-h">Payment Successful! 🎉</h2>
+    <p class="success-p" id="success-p">Your subscription is now active. Welcome to AutoBook AI <strong id="success-plan-name">Growth</strong>! Your AI receptionist is ready to go live.</p>
+    <div class="success-details">
+      <div class="sd-row"><span class="sd-l">Plan</span><span class="sd-v" id="sd-plan">Growth — $149/mo</span></div>
+      <div class="sd-row"><span class="sd-l">Billed to</span><span class="sd-v" id="sd-card">Visa ····4242</span></div>
+      <div class="sd-row"><span class="sd-l">Next billing</span><span class="sd-v" id="sd-next">June 8, 2025</span></div>
+      <div class="sd-row"><span class="sd-l">Receipt</span><span class="sd-v"><a href="#" style="color:var(--brand)">Sent to your email ↗</a></span></div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center">
+      <button class="btn btn-p btn-lg" onclick="goToDashboard()">Go to Dashboard →</button>
+      <button class="btn btn-o" onclick="closeSuccess()">View Invoice</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FAILED PAYMENT MODAL ══ -->
+<div class="confirm-overlay" id="failed-modal">
+  <div class="failed-box">
+    <div class="failed-icon">❌</div>
+    <div class="failed-h">Payment Declined</div>
+    <p class="failed-p">Your card was declined. This can happen for a few reasons. Please check the details below and try again, or use a different payment method.</p>
+    <div class="failed-reasons">
+      <div class="fr-title">Common reasons for declined cards:</div>
+      <div class="fr-item">💳 Insufficient funds or credit limit reached</div>
+      <div class="fr-item">🔢 Incorrect card number, expiry, or CVC</div>
+      <div class="fr-item">🏦 Bank blocked the transaction (call your bank)</div>
+      <div class="fr-item">📍 Billing address or ZIP doesn't match</div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-o f1" onclick="closeFailedModal()">Cancel</button>
+      <button class="btn btn-p f1" onclick="closeFailedModal();retryPayment()">Try Again →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONFIRM DOWNGRADE ══ -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="confirm-icon">🔄</div>
+    <div class="confirm-h" id="confirm-h">Downgrade to Starter?</div>
+    <p class="confirm-p" id="confirm-p">You'll lose access to SMS reminders, analytics, CRM, and AI auto-booking. These features will be disabled at the end of your current billing period.</p>
+    <div class="alert alert-warn"><span>⚠️</span><div id="confirm-warn-text">Your Growth plan features remain active until <strong>June 8, 2025</strong>.</div></div>
+    <div class="confirm-btns">
+      <button class="btn btn-o f1" onclick="closeConfirm()">Keep Current Plan</button>
+      <button class="btn f1" id="confirm-action-btn" style="background:#fee2e2;color:var(--err);border:1.5px solid #fecaca;font-weight:700">Confirm Downgrade</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CANCEL CONFIRM ══ -->
+<div class="confirm-overlay" id="cancel-overlay">
+  <div class="confirm-box">
+    <div class="confirm-icon" style="background:#fee2e2">😢</div>
+    <div class="confirm-h">Cancel your subscription?</div>
+    <p class="confirm-p">We're sorry to see you go. Your plan will remain active until <strong>June 8, 2025</strong>, then your account will revert to the free tier.</p>
+    <div class="alert alert-warn"><span>💡</span><div>Before you cancel, did you know you can <strong>pause your subscription</strong> for up to 3 months?</div></div>
+    <div style="margin-bottom:16px">
+      <label style="font-size:13px;font-weight:600;color:var(--tx2);display:block;margin-bottom:6px">Reason for canceling (optional)</label>
+      <select style="width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:var(--rs);font-size:13px;outline:none">
+        <option>Select a reason…</option>
+        <option>Too expensive</option>
+        <option>Not using it enough</option>
+        <option>Missing a feature I need</option>
+        <option>Switching to another tool</option>
+        <option>Business closed or paused</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="confirm-btns">
+      <button class="btn btn-p f1" onclick="closeCancelOverlay()">Keep My Plan</button>
+      <button class="btn btn-ghost f1" onclick="doCancel()" style="color:var(--err)">Cancel Subscription</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOAST ══ -->
+<div style="position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px" id="toast-stack"></div>
+
+
+<script>
+/* ═══════════════════════════════════════
+   STATE
+═══════════════════════════════════════ */
+const PLANS = {
+  starter: {
+    name:'Starter', tier:'🌱 Solo Businesses',
+    monthly:49, annual:39, annualTotal:468,
+    savings:120, features:['AI replies 24/7','100 bookings/month','Email reminders','Basic calendar','1 location']
+  },
+  growth: {
+    name:'Growth', tier:'🚀 Growing Businesses',
+    monthly:149, annual:119, annualTotal:1428,
+    savings:360, features:['Full AI Receptionist','Unlimited bookings','SMS reminders','Analytics','CRM','3 team members']
+  },
+  pro: {
+    name:'Pro', tier:'⚡ Busy Businesses',
+    monthly:299, annual:239, annualTotal:2868,
+    savings:720, features:['Everything in Growth','Multiple locations','Unlimited team','Priority support','Custom AI','API access']
+  }
+};
+
+const INVOICES = [
+  {id:'INV-2025-0508', date:'May 8, 2025', plan:'Growth Plan', amount:'$149.00', status:'paid', type:'subscription'},
+  {id:'INV-2025-0408', date:'Apr 8, 2025', plan:'Growth Plan', amount:'$149.00', status:'paid', type:'subscription'},
+  {id:'INV-2025-0308', date:'Mar 8, 2025', plan:'Growth Plan', amount:'$149.00', status:'paid', type:'subscription'},
+  {id:'INV-2025-0208', date:'Feb 8, 2025', plan:'Starter Plan', amount:'$49.00', status:'paid', type:'subscription'},
+  {id:'INV-2025-0108', date:'Jan 8, 2025', plan:'Starter Plan', amount:'$49.00', status:'paid', type:'subscription'},
+  {id:'INV-2024-1208', date:'Dec 8, 2024', plan:'Starter Plan — Annual', amount:'$468.00', status:'paid', type:'annual'},
+];
+
+let state = {
+  currentPlan: 'growth',
+  billing: 'monthly',
+  checkoutPlan: 'growth',
+  checkoutMode: 'subscribe',
+  paymentMethod: {brand:'Visa', last4:'4242', exp:'12/27'}
+};
+
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+function init() {
+  // Load session
+  try {
+    const s = localStorage.getItem('ab_session') || sessionStorage.getItem('ab_session');
+    if (s) {
+      const d = JSON.parse(s);
+      const initials = ((d.firstName||'N')[0]+(d.lastName||'P')[0]).toUpperCase();
+      const nav_av = document.getElementById('nav-av'); if(nav_av) nav_av.textContent = initials;
+      const nav_name = document.getElementById('nav-name'); if(nav_name) nav_name.textContent = (d.firstName||'Natalie')+' '+(d.lastName||'Park');
+      if (d.email) {
+        const coEmail = document.getElementById('co-email'); if(coEmail) coEmail.value = d.email;
+      }
+      // Load plan from session
+      const billing = JSON.parse(localStorage.getItem('ab_billing') || '{}');
+      if (billing.plan) { state.currentPlan = billing.plan; state.billing = billing.cycle || 'monthly'; }
+    }
+  } catch(e) {}
+
+  renderPlanButtons();
+  renderInvoices();
+  updateBanner();
+  setBilling(state.billing);
+}
+
+/* ═══════════════════════════════════════
+   BILLING TOGGLE
+═══════════════════════════════════════ */
+function setBilling(mode) {
+  state.billing = mode;
+  const isAnnual = mode === 'annual';
+  document.getElementById('btgl-m').classList.toggle('on', !isAnnual);
+  document.getElementById('btgl-a').classList.toggle('on', isAnnual);
+  document.getElementById('save-badge').style.opacity = isAnnual ? '1' : '0';
+
+  const prices = { starter: isAnnual ? 39 : 49, growth: isAnnual ? 119 : 149, pro: isAnnual ? 239 : 299 };
+  const billedText = {
+    starter: isAnnual ? '$468/yr · save $120' : 'Billed monthly · cancel anytime',
+    growth: isAnnual ? '$1,428/yr · save $360' : 'Billed monthly · cancel anytime',
+    pro: isAnnual ? '$2,868/yr · save $720' : 'Billed monthly · cancel anytime'
+  };
+  Object.entries(prices).forEach(([plan, price]) => {
+    const el = document.getElementById('price-'+plan);
+    if (el) { el.style.transform = 'translateY(-4px)'; el.style.opacity = '0';
+      setTimeout(() => { el.textContent='$'+price; el.style.transform=''; el.style.opacity='1'; }, 180); }
+    const bl = document.getElementById('billed-'+plan); if(bl) setTimeout(()=>bl.textContent=billedText[plan],180);
+  });
+}
+
+/* ═══════════════════════════════════════
+   PLAN BUTTONS
+═══════════════════════════════════════ */
+function renderPlanButtons() {
+  const p = state.currentPlan;
+  const order = ['starter','growth','pro'];
+  const currentIdx = order.indexOf(p);
+
+  order.forEach((plan, idx) => {
+    const btn = document.getElementById('btn-'+plan);
+    const card = document.getElementById('card-'+plan);
+    if (!btn || !card) return;
+
+    card.classList.remove('current');
+    if (plan === p) {
+      card.classList.add('current');
+      btn.className = 'plan-btn plan-btn-current';
+      btn.textContent = '✓ Current Plan';
+      btn.disabled = true;
+    } else if (idx > currentIdx) {
+      // Upgrade
+      btn.disabled = false;
+      if (plan === 'growth') { btn.className = 'plan-btn plan-btn-white'; btn.textContent = 'Upgrade to Growth →'; }
+      else { btn.className = 'plan-btn plan-btn-dark'; btn.textContent = 'Upgrade to Pro →'; }
+    } else {
+      // Downgrade
+      btn.disabled = false;
+      btn.className = 'plan-btn plan-btn-outline';
+      btn.textContent = 'Downgrade to '+PLANS[plan].name;
+    }
+  });
+
+  // Current plan pill in header
+  const pill = document.getElementById('current-plan-pill');
+  if (pill) { pill.textContent = '✓ Currently on '+PLANS[p].name; }
+}
+
+function updateBanner() {
+  const p = state.currentPlan;
+  const plan = PLANS[p];
+  const price = state.billing === 'annual' ? plan.annual : plan.monthly;
+  document.getElementById('cpb-name').textContent = plan.name;
+  const badge = document.getElementById('cpb-badge');
+  const colors = {starter:'b-blue',growth:'b-gradient',pro:'b-gradient'};
+  badge.className = 'badge ' + colors[p];
+  badge.textContent = '● Active';
+  document.getElementById('cpb-next').textContent = `Next billing: June 8, 2025 · $${price}.00`;
+  document.getElementById('cpb-bookings').textContent = p === 'starter' ? '100' : '∞';
+}
+
+/* ═══════════════════════════════════════
+   HANDLE PLAN CLICK
+═══════════════════════════════════════ */
+function handlePlanClick(plan) {
+  const order = ['starter','growth','pro'];
+  const currentIdx = order.indexOf(state.currentPlan);
+  const newIdx = order.indexOf(plan);
+
+  if (newIdx > currentIdx) {
+    // Upgrade
+    openCheckout(plan, 'upgrade');
+  } else {
+    // Downgrade
+    openDowngradeConfirm(plan);
+  }
+}
+
+function openDowngradeConfirm(plan) {
+  const pl = PLANS[plan];
+  document.getElementById('confirm-h').textContent = `Downgrade to ${pl.name}?`;
+  const lostFeatures = {
+    starter: 'SMS reminders, Analytics, CRM, AI auto-booking, and unlimited bookings',
+    growth: 'Multiple locations, unlimited team, priority support, and API access'
+  };
+  document.getElementById('confirm-p').textContent = `You'll lose access to ${lostFeatures[plan] || 'advanced features'}. These will be disabled at the end of your billing period.`;
+  const actionBtn = document.getElementById('confirm-action-btn');
+  actionBtn.textContent = `Confirm Downgrade to ${pl.name}`;
+  actionBtn.onclick = () => { closeConfirm(); doDowngrade(plan); };
+  document.getElementById('confirm-overlay').classList.add('show');
+}
+
+function doDowngrade(plan) {
+  state.currentPlan = plan;
+  saveBillingState();
+  renderPlanButtons();
+  updateBanner();
+  showToast(`✅ Downgraded to ${PLANS[plan].name}. Changes take effect after June 8, 2025.`, 'ok');
+}
+
+function closeConfirm() { document.getElementById('confirm-overlay').classList.remove('show'); }
+
+/* ═══════════════════════════════════════
+   CHECKOUT MODAL
+═══════════════════════════════════════ */
+function openCheckout(plan, mode = 'subscribe') {
+  state.checkoutPlan = plan;
+  state.checkoutMode = mode;
+  const pl = PLANS[plan];
+  const isAnnual = state.billing === 'annual';
+  const price = isAnnual ? pl.annual : pl.monthly;
+  const annualTotal = pl.annualTotal;
+
+  document.getElementById('co-plan-label').textContent = `${pl.name} Plan`;
+  document.getElementById('co-amount').textContent = `$${price}`;
+  document.getElementById('co-cycle').textContent = isAnnual ? `per month (billed $${annualTotal}/year)` : 'per month';
+  document.getElementById('co-line-plan').textContent = `${pl.name} Plan (${isAnnual?'annual':'monthly'})`;
+  document.getElementById('co-line-price').textContent = isAnnual ? `$${annualTotal}.00` : `$${price}.00`;
+  document.getElementById('co-total').textContent = isAnnual ? `$${annualTotal}.00` : `$${price}.00`;
+
+  const discountLine = document.getElementById('co-line-discount');
+  if (isAnnual) {
+    discountLine.style.display = 'flex';
+    document.getElementById('co-discount-val').textContent = `−$${(price * 12 - annualTotal).toFixed(2)}`;
+  } else { discountLine.style.display = 'none'; }
+
+  const submitBtn = document.getElementById('co-btn-text');
+  const formTitle = document.getElementById('co-form-title');
+  const formSub = document.getElementById('co-form-sub');
+
+  if (mode === 'upgrade') {
+    formTitle.textContent = `Upgrade to ${pl.name}`;
+    formSub.textContent = `You'll be charged $${price}${isAnnual ? '/year' : '/month'} starting today. Prorated credits from your current plan will be applied.`;
+    submitBtn.textContent = `Upgrade — $${price}/${isAnnual?'yr':'mo'}`;
+  } else if (mode === 'update-card') {
+    formTitle.textContent = 'Update Payment Method';
+    formSub.textContent = 'Add a new card. Your subscription will automatically use the new default card.';
+    submitBtn.textContent = 'Save Payment Method';
+    document.getElementById('co-amount').textContent = '$—';
+    document.getElementById('co-cycle').textContent = 'payment method update';
+  } else if (mode === 'retry') {
+    formTitle.textContent = 'Retry Payment';
+    formSub.textContent = 'Your last payment failed. Enter a new card to retry.';
+    submitBtn.textContent = `Pay $${price} Now`;
+  } else {
+    formTitle.textContent = `Subscribe to ${pl.name}`;
+    formSub.textContent = `You'll be charged $${price}/${isAnnual?'year':'month'}. Cancel anytime.`;
+    submitBtn.textContent = `Subscribe — $${price}/${isAnnual?'yr':'mo'}`;
+  }
+
+  // Pre-fill card if on file
+  const pmNum = document.getElementById('co-card');
+  if (pmNum && !pmNum.value) pmNum.value = '4242 4242 4242 4242';
+  const pmExp = document.getElementById('co-exp');
+  if (pmExp && !pmExp.value) pmExp.value = '12 / 27';
+  const pmCvc = document.getElementById('co-cvc');
+  if (pmCvc && !pmCvc.value) pmCvc.value = '123';
+  const pmName = document.getElementById('co-name');
+  if (pmName && !pmName.value) pmName.value = 'Natalie Park';
+  const pmZip = document.getElementById('co-zip');
+  if (pmZip && !pmZip.value) pmZip.value = '90069';
+
+  hideCheckoutAlert();
+  document.getElementById('checkout-modal').classList.add('show');
+}
+
+function closeCheckout() { document.getElementById('checkout-modal').classList.remove('show'); }
+
+/* ═══════════════════════════════════════
+   CARD INPUT FORMATTING
+═══════════════════════════════════════ */
+function formatCard(inp) {
+  let v = inp.value.replace(/\D/g,'').slice(0,16);
+  inp.value = v.replace(/(.{4})/g,'$1 ').trim();
+  const brand = document.getElementById('co-card-brand');
+  if (v.startsWith('4')) { brand.textContent='💙'; inp.maxLength=19; }
+  else if (v.startsWith('5')) { brand.textContent='🔴'; }
+  else if (v.startsWith('3')) { brand.textContent='🟢'; inp.maxLength=17; }
+  else { brand.textContent='💳'; }
+  inp.classList.remove('err'); document.getElementById('err-card').classList.remove('show');
+}
+function formatExpiry(inp) {
+  let v = inp.value.replace(/\D/g,'');
+  if (v.length >= 3) v = v.slice(0,2)+' / '+v.slice(2,4);
+  inp.value = v;
+  inp.classList.remove('err'); document.getElementById('err-exp').classList.remove('show');
+}
+function validateCard(inp) {
+  const digits = inp.value.replace(/\D/g,'');
+  if (digits.length < 13) { inp.classList.add('err'); document.getElementById('err-card').classList.add('show'); return false; }
+  inp.classList.remove('err'); inp.classList.add('ok'); return true;
+}
+function validateExpiry(inp) {
+  const v = inp.value.replace(/\D/g,'');
+  if (v.length < 4) { inp.classList.add('err'); document.getElementById('err-exp').classList.add('show'); return false; }
+  const month = parseInt(v.slice(0,2)); const year = parseInt('20'+v.slice(2,4));
+  const now = new Date(); const currYear = now.getFullYear(); const currMonth = now.getMonth()+1;
+  if (month < 1 || month > 12 || year < currYear || (year === currYear && month < currMonth)) {
+    inp.classList.add('err'); document.getElementById('err-exp').classList.add('show'); return false;
+  }
+  inp.classList.remove('err'); inp.classList.add('ok'); return true;
+}
+function validateCVC(inp) {
+  if (inp.value.length < 3) { inp.classList.add('err'); document.getElementById('err-cvc').classList.add('show'); return false; }
+  inp.classList.remove('err'); inp.classList.add('ok'); return true;
+}
+function validateCardName(inp) {
+  if (!inp.value.trim()) { inp.classList.add('err'); document.getElementById('err-name').classList.add('show'); return false; }
+  inp.classList.remove('err'); document.getElementById('err-name').classList.remove('show'); return true;
+}
+function hideCheckoutAlert() {
+  const a = document.getElementById('checkout-alert'); if(a) a.style.display='none';
+}
+
+/* ═══════════════════════════════════════
+   SUBMIT PAYMENT
+═══════════════════════════════════════ */
+function submitPayment() {
+  // Validate
+  const cardOk = validateCard(document.getElementById('co-card'));
+  const expOk = validateExpiry(document.getElementById('co-exp'));
+  const cvcOk = validateCVC(document.getElementById('co-cvc'));
+  const nameOk = validateCardName(document.getElementById('co-name'));
+  if (!cardOk || !expOk || !cvcOk || !nameOk) return;
+
+  const btn = document.getElementById('co-submit-btn');
+  btn.disabled = true; btn.classList.add('btn-loading');
+  hideCheckoutAlert();
+
+  // Simulate Stripe processing (1 in 8 chance of decline for demo)
+  const cardNum = document.getElementById('co-card').value.replace(/\D/g,'');
+  const willFail = cardNum === '4000000000000002'; // Stripe test decline card
+
+  setTimeout(() => {
+    btn.disabled = false; btn.classList.remove('btn-loading');
+    if (willFail) {
+      // Payment failed
+      document.getElementById('checkout-alert').style.display = 'flex';
+      document.getElementById('checkout-alert-text').textContent = 'Your card was declined. Please use a different card or contact your bank.';
+      closeCheckout();
+      setTimeout(() => document.getElementById('failed-modal').classList.add('show'), 300);
+    } else {
+      // Payment success
+      closeCheckout();
+      handlePaymentSuccess();
+    }
+  }, 2200);
+}
+
+function handlePaymentSuccess() {
+  const plan = state.checkoutPlan;
+  const pl = PLANS[plan];
+  const isAnnual = state.billing === 'annual';
+  const price = isAnnual ? pl.annual : pl.monthly;
+  const last4 = document.getElementById('co-card').value.replace(/\D/g,'').slice(-4);
+
+  // Update state
+  if (state.checkoutMode !== 'update-card') {
+    state.currentPlan = plan;
+    state.paymentMethod = { brand:'Visa', last4, exp: document.getElementById('co-exp').value };
+    saveBillingState();
+    renderPlanButtons();
+    updateBanner();
+  } else {
+    state.paymentMethod = { brand:'Visa', last4, exp: document.getElementById('co-exp').value };
+    document.getElementById('pm-num').textContent = `Visa ending in ${last4}`;
+    document.getElementById('pm-exp').textContent = `Expires ${document.getElementById('co-exp').value}`;
+  }
+
+  // Update success modal
+  document.getElementById('success-plan-name').textContent = pl.name;
+  document.getElementById('sd-plan').textContent = `${pl.name} — $${price}/${isAnnual?'yr':'mo'}`;
+  document.getElementById('sd-card').textContent = `Visa ····${last4}`;
+
+  const nextDate = new Date(); nextDate.setMonth(nextDate.getMonth()+1);
+  document.getElementById('sd-next').textContent = nextDate.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+
+  if (state.checkoutMode === 'update-card') {
+    document.getElementById('success-ring').textContent = '💳';
+    document.getElementById('success-h').textContent = 'Payment Method Updated!';
+    document.getElementById('success-p').textContent = 'Your new card has been saved and will be used for all future billing.';
+  } else {
+    document.getElementById('success-ring').textContent = '✓';
+    document.getElementById('success-h').textContent = `${state.checkoutMode === 'upgrade' ? 'Upgraded to' : 'Welcome to'} ${pl.name}! 🎉`;
+    document.getElementById('success-p').innerHTML = `Your <strong>${pl.name}</strong> subscription is now active. Your AI receptionist Aria is ready to go live.`;
+  }
+
+  document.getElementById('success-overlay').classList.add('show');
+  setTimeout(() => launchConfetti(), 300);
+}
+
+function closeSuccess() { document.getElementById('success-overlay').classList.remove('show'); }
+function goToDashboard() { window.location.href = 'autobook-ai.html'; }
+
+/* ═══════════════════════════════════════
+   FAILED PAYMENT
+═══════════════════════════════════════ */
+function closeFailedModal() { document.getElementById('failed-modal').classList.remove('show'); }
+function retryPayment() { openCheckout(state.checkoutPlan, state.checkoutMode); }
+
+/* ═══════════════════════════════════════
+   CANCEL
+═══════════════════════════════════════ */
+function confirmCancel() { document.getElementById('cancel-overlay').classList.add('show'); }
+function closeCancelOverlay() { document.getElementById('cancel-overlay').classList.remove('show'); }
+function doCancel() {
+  closeCancelOverlay();
+  state.currentPlan = 'starter';
+  saveBillingState();
+  renderPlanButtons();
+  updateBanner();
+  showToast('✅ Subscription canceled. Your plan stays active until June 8, 2025.', 'ok');
+}
+
+/* ═══════════════════════════════════════
+   INVOICES
+═══════════════════════════════════════ */
+function renderInvoices() {
+  const list = document.getElementById('invoice-list');
+  if (!list) return;
+  const icons = { subscription:'💳', annual:'🔄' };
+  const colors = { paid:'#d1fae5', failed:'#fee2e2' };
+  const textColors = { paid:'#065f46', failed:'#991b1b' };
+  list.innerHTML = INVOICES.map(inv => `
+    <div class="invoice-row">
+      <div class="inv-icon" style="background:${colors[inv.status]}">
+        ${icons[inv.type]||'💳'}
+      </div>
+      <div class="inv-info">
+        <div class="inv-name">${inv.plan}</div>
+        <div class="inv-date">${inv.date} · ${inv.id}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="badge" style="background:${colors[inv.status]};color:${textColors[inv.status]}">
+          ${inv.status === 'paid' ? '✓ Paid' : '✗ Failed'}
+        </span>
+        <div class="inv-amount">${inv.amount}</div>
+        <button class="btn btn-ghost btn-xs" onclick="downloadInvoice('${inv.id}')" style="font-size:14px" title="Download PDF">⬇️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function downloadInvoice(id) {
+  showToast(`📥 Invoice ${id} downloading…`, 'ok');
+}
+
+/* ═══════════════════════════════════════
+   SAVE STATE
+═══════════════════════════════════════ */
+function saveBillingState() {
+  localStorage.setItem('ab_billing', JSON.stringify({ plan: state.currentPlan, cycle: state.billing }));
+}
+
+/* ═══════════════════════════════════════
+   CONFETTI
+═══════════════════════════════════════ */
+function launchConfetti() {
+  const cv = document.getElementById('confetti-canvas');
+  if (!cv) return;
+  cv.width = cv.offsetWidth; cv.height = cv.offsetHeight;
+  const ctx = cv.getContext('2d');
+  const cols = ['#6366f1','#8b5cf6','#10b981','#f59e0b','#ec4899','#a5b4fc','#fcd34d','#6ee7b7'];
+  const ps = Array.from({length:80}, () => ({
+    x:Math.random()*cv.width, y:Math.random()*cv.height-cv.height,
+    w:Math.random()*8+3, h:Math.random()*4+2,
+    c:cols[Math.floor(Math.random()*cols.length)],
+    r:Math.random()*Math.PI*2, rv:(Math.random()-.5)*.1,
+    vy:Math.random()*3+1.5, vx:(Math.random()-.5)*1.5
+  }));
+  let f = 0;
+  const draw = () => {
+    ctx.clearRect(0,0,cv.width,cv.height);
+    ps.forEach(p => {
+      ctx.save(); ctx.translate(p.x+p.w/2,p.y+p.h/2); ctx.rotate(p.r);
+      ctx.fillStyle=p.c; ctx.globalAlpha=Math.max(0,1-f/130);
+      ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore();
+      p.y+=p.vy; p.x+=p.vx; p.r+=p.rv;
+    });
+    if(++f<150) requestAnimationFrame(draw);
+  };
+  draw();
+}
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+function showToast(msg, type='ok') {
+  const stack = document.getElementById('toast-stack');
+  const colors = { ok:'#f0fdf4', warn:'#fffbeb', err:'#fff1f1', info:'#eff6ff' };
+  const borders = { ok:'#bbf7d0', warn:'#fde68a', err:'#fecaca', info:'#bfdbfe' };
+  const el = document.createElement('div');
+  el.style.cssText = `background:${colors[type]};border:1px solid ${borders[type]};border-radius:10px;padding:12px 16px;font-size:13px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.1);max-width:360px;display:flex;align-items:center;gap:8px;transform:translateX(380px);transition:transform .4s cubic-bezier(.34,1.4,.64,1),opacity .3s;opacity:0`;
+  el.innerHTML = msg;
+  stack.appendChild(el);
+  requestAnimationFrame(() => { requestAnimationFrame(() => { el.style.transform='translateX(0)'; el.style.opacity='1'; }); });
+  setTimeout(() => { el.style.transform='translateX(380px)'; el.style.opacity='0'; setTimeout(()=>el.remove(),400); }, 4500);
+}
+
+/* ═══════════════════════════════════════
+   CLOSE MODALS ON OVERLAY CLICK
+═══════════════════════════════════════ */
+document.getElementById('checkout-modal').addEventListener('click', e => { if(e.target.id==='checkout-modal') closeCheckout(); });
+document.getElementById('success-overlay').addEventListener('click', e => { if(e.target.id==='success-overlay') closeSuccess(); });
+document.getElementById('failed-modal').addEventListener('click', e => { if(e.target.id==='failed-modal') closeFailedModal(); });
+document.getElementById('confirm-overlay').addEventListener('click', e => { if(e.target.id==='confirm-overlay') closeConfirm(); });
+document.getElementById('cancel-overlay').addEventListener('click', e => { if(e.target.id==='cancel-overlay') closeCancelOverlay(); });
+
+/* ═══════════════════════════════════════
+   SCROLL TO SECTION
+═══════════════════════════════════════ */
+function showSection(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+/* ═══════════════════════════════════════
+   KEYBOARD
+═══════════════════════════════════════ */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeCheckout(); closeSuccess(); closeFailedModal(); closeConfirm(); closeCancelOverlay();
+  }
+});
+
+/* ═══════════════════════════════════════
+   DEMO HINT — show failed payment demo
+═══════════════════════════════════════ */
+function showFailedDemo() {
+  const el = document.createElement('div');
+  el.style.cssText = 'position:fixed;bottom:80px;right:24px;z-index:9999;background:#0f172a;color:#fff;padding:12px 16px;border-radius:10px;font-size:12.5px;box-shadow:0 4px 16px rgba(0,0,0,.3);max-width:300px;line-height:1.6';
+  el.innerHTML = '💡 <strong>Demo tip:</strong> Use card <code style="background:rgba(255,255,255,.1);padding:1px 6px;border-radius:4px">4000 0000 0000 0002</code> to trigger a declined payment.';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 6000);
+}
+
+/* ═══════════════════════════════════════
+   START
+═══════════════════════════════════════ */
+init();
+setTimeout(showFailedDemo, 2000);
+</script>
+</body>
+</html>

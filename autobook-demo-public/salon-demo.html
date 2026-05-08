@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AutoBook AI — Salon Owner Journey</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0d1117;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+button{cursor:pointer;font-family:inherit}
+input,textarea,select{font-family:inherit}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:#333;border-radius:4px}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:rgba(13,17,23,.97);border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;padding:0 20px;height:52px;gap:12px}
+.nav-logo{display:flex;align-items:center;gap:8px}
+.nav-icon{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;flex-shrink:0}
+.nav-name{font-size:14px;font-weight:800;letter-spacing:-.3px}
+.nav-name span{color:#a5b4fc}
+.nav-divider{width:1px;height:16px;background:rgba(255,255,255,.1)}
+.nav-sub{font-size:11.5px;color:rgba(255,255,255,.3)}
+.nav-space{flex:1}
+.nav-steps{display:flex;gap:2px}
+.nstep{padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:700;cursor:pointer;color:rgba(255,255,255,.25);transition:all .2s}
+.nstep.active{background:rgba(99,102,241,.2);color:#a5b4fc}
+.nstep.done{background:rgba(16,185,129,.12);color:#6ee7b7}
+.nav-restart{padding:5px 12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);border-radius:20px;font-size:11px;font-weight:600;color:rgba(255,255,255,.5);transition:all .2s}
+.nav-restart:hover{background:rgba(255,255,255,.1);color:#fff}
+
+/* PROGRESS */
+.prog{height:2px;background:rgba(255,255,255,.05)}
+.prog-bar{height:100%;background:linear-gradient(90deg,#6366f1,#8b5cf6);transition:width .5s ease;width:0%}
+
+/* SCENES */
+.scene{display:none;min-height:calc(100vh - 54px);flex-direction:column}
+.scene.on{display:flex;animation:up .3s ease}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* SCENE HEADER */
+.hd{padding:24px 36px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.hd-left{}
+.hd-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.25);color:#a5b4fc;padding:3px 12px;border-radius:20px;font-size:10.5px;font-weight:700;margin-bottom:8px}
+.hd-title{font-size:22px;font-weight:900;letter-spacing:-.5px;line-height:1.2;color:#fff}
+.hd-title .g{background:linear-gradient(135deg,#6366f1,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hd-sub{font-size:13px;color:rgba(255,255,255,.4);margin-top:5px;max-width:500px;line-height:1.65}
+.hd-clock{font-size:11px;color:rgba(255,255,255,.25);background:rgba(255,255,255,.04);padding:4px 11px;border-radius:20px;border:1px solid rgba(255,255,255,.06);flex-shrink:0;white-space:nowrap}
+
+/* BODY */
+.body{flex:1;padding:18px 36px}
+
+/* NARRATOR */
+.narrator{padding:14px 36px;background:rgba(99,102,241,.07);border-top:1px solid rgba(99,102,241,.15);display:flex;gap:10px;align-items:flex-start}
+.nar-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;margin-top:1px}
+.nar-body{flex:1}
+.nar-label{font-size:10px;font-weight:700;color:#a5b4fc;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px}
+.nar-text{font-size:13px;color:rgba(255,255,255,.7);line-height:1.6}
+.nar-text strong{color:#fff}
+.nar-btns{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
+.btn-go{padding:8px 18px;border-radius:7px;font-size:13px;font-weight:700;border:none;display:inline-flex;align-items:center;gap:5px;transition:all .18s}
+.btn-primary{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;box-shadow:0 2px 12px rgba(99,102,241,.3)}
+.btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn-ghost{background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.1)}
+.btn-ghost:hover{background:rgba(255,255,255,.1);color:#fff}
+.btn-pulse{animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 2px 12px rgba(99,102,241,.3)}50%{box-shadow:0 2px 24px rgba(99,102,241,.6)}}
+
+/* CARDS */
+.card{background:#fff;border-radius:12px;border:1px solid #e2e8f0;overflow:hidden;margin-bottom:12px}
+.card-hd{padding:11px 15px;border-bottom:1px solid #e2e8f0;font-size:12.5px;font-weight:700;color:#0f172a;display:flex;align-items:center;justify-content:space-between}
+.card-bd{padding:14px 15px}
+.dark-card{background:#161b22;border-radius:12px;border:1px solid rgba(255,255,255,.08);overflow:hidden;margin-bottom:12px}
+.dark-card-hd{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);font-size:11.5px;font-weight:700;color:rgba(255,255,255,.5);display:flex;align-items:center;justify-content:space-between}
+.dark-card-bd{padding:14px}
+
+/* FORM */
+.fg{margin-bottom:10px}
+.fl{font-size:11px;font-weight:700;color:#334155;display:block;margin-bottom:4px}
+.fi{width:100%;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:12.5px;color:#0f172a;background:#fff;transition:border .2s,box-shadow .2s;outline:none}
+.fi:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.1)}
+.fi.typing{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.1)}
+.fi.filled{border-color:#10b981;background:#f0fdf4}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* BIZ TYPE */
+.btype{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.btc{padding:10px 6px;border-radius:8px;border:2px solid #e2e8f0;text-align:center;font-size:11px;font-weight:700;color:#64748b;cursor:pointer;transition:all .18s}
+.btc.sel{border-color:#6366f1;background:#eef2ff;color:#6366f1}
+.btc-i{font-size:18px;margin-bottom:3px}
+
+/* SERVICES */
+.svcs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.svc{padding:11px 13px;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff}
+.svc.on{border-color:#10b981;background:#f0fdf4}
+.svc-name{font-size:12.5px;font-weight:700;color:#0f172a}
+.svc-price{font-size:17px;font-weight:900;color:#6366f1}
+.svc-meta{font-size:11px;color:#64748b;margin-top:2px}
+
+/* HOURS */
+.hr-list{display:flex;flex-direction:column}
+.hr-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px}
+.hr-row:last-child{border-bottom:none}
+.hr-day{font-weight:600;color:rgba(255,255,255,.7);width:80px}
+.hr-time{color:rgba(255,255,255,.4)}
+.on-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:rgba(16,185,129,.15);color:#6ee7b7}
+
+/* TOGGLES */
+.tgl-list{display:flex;flex-direction:column}
+.tgl{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.tgl:last-child{border-bottom:none}
+.tgl-lbl{font-size:12.5px;color:rgba(255,255,255,.7)}
+.tgl-on{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(16,185,129,.15);color:#6ee7b7;border:1px solid rgba(16,185,129,.2)}
+
+/* COMPARE */
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.cmp-no{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.18);border-radius:10px;padding:12px}
+.cmp-yes{background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.18);border-radius:10px;padding:12px}
+.cmp-title{font-size:11.5px;font-weight:800;margin-bottom:8px}
+.cmp-item{font-size:12px;color:rgba(255,255,255,.55);margin-bottom:5px;display:flex;align-items:flex-start;gap:5px}
+
+/* CHAT */
+.chat{background:#161b22;border-radius:12px;border:1px solid rgba(255,255,255,.07);overflow:hidden}
+.chat-top{padding:10px 13px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:8px}
+.chat-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
+.chat-name{font-size:12.5px;font-weight:700;color:#fff}
+.chat-status{font-size:10.5px;color:#10b981;display:flex;align-items:center;gap:4px;margin-top:1px}
+.chat-status::before{content:'';width:5px;height:5px;background:#10b981;border-radius:50%;box-shadow:0 0 4px #10b981}
+.msgs{padding:12px;display:flex;flex-direction:column;gap:8px;min-height:200px}
+.msg{display:flex;gap:6px;max-width:85%}
+.msg.r{align-self:flex-end;flex-direction:row-reverse}
+.m-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;color:#fff;flex-shrink:0;margin-top:2px}
+.m-bubble{padding:8px 11px;border-radius:12px;font-size:12.5px;line-height:1.5;color:rgba(255,255,255,.88)}
+.msg:not(.r) .m-bubble{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);border-bottom-left-radius:3px}
+.msg.r .m-bubble{background:linear-gradient(135deg,#6366f1,#8b5cf6);border-bottom-right-radius:3px}
+.m-time{font-size:9.5px;color:rgba(255,255,255,.2);margin-top:2px}
+.msg.r .m-time{text-align:right}
+.typing-wrap{display:flex;gap:6px;align-items:flex-end}
+.t-bub{display:flex;gap:3px;padding:9px 12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);border-radius:12px;border-bottom-left-radius:3px}
+.dot{width:5px;height:5px;background:rgba(255,255,255,.3);border-radius:50%;animation:blink 1.4s infinite}
+.dot:nth-child(2){animation-delay:.2s}
+.dot:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.2;transform:scale(.7)}40%{opacity:1;transform:scale(1)}}
+
+/* BOOKING CARD */
+.bk{background:rgba(99,102,241,.1);border:1.5px solid rgba(99,102,241,.22);border-radius:11px;padding:14px}
+.bk-title{font-size:12px;font-weight:800;color:#a5b4fc;margin-bottom:10px;display:flex;align-items:center;gap:5px}
+.bk-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px}
+.bk-row:last-child{border-bottom:none}
+.bk-l{color:rgba(255,255,255,.4)}
+.bk-v{color:#fff;font-weight:600}
+.bk-status{margin-top:10px;display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.2);border-radius:20px;padding:4px 12px;font-size:10.5px;font-weight:700;color:#6ee7b7}
+.bk-dot{width:5px;height:5px;background:#10b981;border-radius:50%;box-shadow:0 0 5px #10b981}
+
+/* DASHBOARD */
+.dash-wrap{background:#161b22;border-radius:12px;border:1px solid rgba(255,255,255,.07);overflow:hidden}
+.dash-banner{background:linear-gradient(135deg,#6366f1,#8b5cf6);padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+.dash-banner-text{font-size:13px;font-weight:800;color:#fff}
+.dash-banner-sub{font-size:11px;color:rgba(255,255,255,.75);margin-top:2px}
+.dash-live{background:rgba(255,255,255,.15);padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px}
+.stat{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:11px}
+.stat-val{font-size:20px;font-weight:900;line-height:1}
+.stat-lbl{font-size:10px;color:rgba(255,255,255,.35);margin-top:3px}
+.stat-trend{font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:10px;background:rgba(16,185,129,.15);color:#6ee7b7;display:inline-block;margin-top:4px}
+.sched{border-top:1px solid rgba(255,255,255,.06)}
+.sched-hd{padding:8px 13px;font-size:11px;font-weight:700;color:rgba(255,255,255,.4);border-bottom:1px solid rgba(255,255,255,.05)}
+.sched-row{padding:8px 13px;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:center;gap:8px}
+.sched-row:last-child{border-bottom:none}
+.sched-row.highlight{background:rgba(99,102,241,.06)}
+.sched-time{font-size:10.5px;font-weight:800;color:#6366f1;min-width:44px}
+.sched-bar{width:2px;height:26px;border-radius:2px;flex-shrink:0}
+.sched-name{font-size:12px;font-weight:700;color:#fff}
+.sched-svc{font-size:10.5px;color:rgba(255,255,255,.35)}
+.sched-badge{margin-left:auto;padding:2px 7px;border-radius:8px;font-size:9.5px;font-weight:700}
+.bg-green{background:#d1fae5;color:#065f46}
+.bg-yellow{background:#fef3c7;color:#92400e}
+.bg-purple{background:#ede9fe;color:#5b21b6}
+.log{border-top:1px solid rgba(255,255,255,.06)}
+.log-hd{padding:8px 13px;font-size:11px;font-weight:700;color:rgba(255,255,255,.4);border-bottom:1px solid rgba(255,255,255,.05)}
+.log-item{display:flex;gap:8px;padding:8px 13px;border-bottom:1px solid rgba(255,255,255,.04)}
+.log-item:last-child{border-bottom:none}
+.log-dot{width:7px;height:7px;border-radius:50%;margin-top:3px;flex-shrink:0}
+.log-time{font-size:10px;color:rgba(255,255,255,.25);min-width:44px;margin-top:1px}
+.log-text{font-size:11.5px;font-weight:600;color:#fff}
+.log-sub{font-size:10.5px;color:rgba(255,255,255,.35);margin-top:1px}
+
+/* INFO BOX */
+.info-box{background:rgba(99,102,241,.08);border:1.5px solid rgba(99,102,241,.2);border-radius:9px;padding:11px 13px;display:flex;gap:8px;margin-bottom:10px}
+.info-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.info-title{font-size:12px;font-weight:800;color:#c4b5fd;margin-bottom:2px}
+.info-body{font-size:11.5px;color:rgba(255,255,255,.5);line-height:1.55}
+
+/* SUCCESS */
+.success{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center}
+.succ-emoji{font-size:64px;animation:pop .5s cubic-bezier(.34,1.56,.64,1);margin-bottom:16px}
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.succ-h{font-size:28px;font-weight:900;letter-spacing:-.7px;margin-bottom:10px}
+.succ-sub{font-size:14px;color:rgba(255,255,255,.5);max-width:480px;line-height:1.7;margin-bottom:28px}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:520px;margin:0 auto 24px}
+.met{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:16px}
+.met-v{font-size:28px;font-weight:900;letter-spacing:-.8px}
+.met-l{font-size:11px;color:rgba(255,255,255,.35);margin-top:4px}
+.recap{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:16px 20px;max-width:480px;margin:0 auto 24px;text-align:left}
+.recap-h{font-size:10px;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
+.recap-row{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:rgba(255,255,255,.65);margin-bottom:8px}
+.recap-row:last-child{margin-bottom:0}
+.chk{width:16px;height:16px;border-radius:50%;background:#d1fae5;color:#065f46;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;margin-top:2px}
+.succ-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.sbtn{padding:9px 20px;border-radius:8px;font-size:13px;font-weight:700;border:none;display:inline-flex;align-items:center;gap:5px;transition:all .18s;text-decoration:none}
+.sbtn-p{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;box-shadow:0 2px 12px rgba(99,102,241,.3)}
+.sbtn-p:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.sbtn-g{background:rgba(255,255,255,.06);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.1)}
+.sbtn-g:hover{background:rgba(255,255,255,.1);color:#fff}
+
+/* STATS TRACKER */
+.tracker{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:13px;margin-bottom:10px}
+.tracker-h{font-size:10px;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:9px}
+.tr-row{display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:6px}
+.tr-row:last-child{margin-bottom:0}
+.tr-lbl{color:rgba(255,255,255,.4)}
+.tr-val{font-weight:700;color:rgba(255,255,255,.25)}
+.tr-val.lit{color:#6ee7b7}
+
+/* SPLIT */
+.split{display:flex;gap:14px;align-items:flex-start}
+.half{flex:1;min-width:0}
+
+/* PHONE */
+.phone{width:200px;flex-shrink:0;background:#111;border-radius:24px;border:2px solid rgba(255,255,255,.1);overflow:hidden;box-shadow:0 16px 50px rgba(0,0,0,.5)}
+.ph-notch{height:20px;background:#111;display:flex;align-items:center;justify-content:center}
+.ph-bar{width:60px;height:3px;background:rgba(255,255,255,.07);border-radius:10px}
+.ph-status{padding:4px 12px;display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,.3)}
+.ph-content{background:#000;padding:0 10px 12px}
+.ph-header{display:flex;align-items:center;gap:7px;padding:7px 0 9px;border-bottom:1px solid #111}
+.ph-name{font-size:11px;font-weight:700;color:#fff}
+.ph-sub{font-size:9px;color:rgba(255,255,255,.3)}
+.ph-chat{padding-top:9px;display:flex;flex-direction:column;gap:7px}
+.ph-in{align-self:flex-start;max-width:82%;background:#1c1c1e;border-radius:14px;border-bottom-left-radius:3px;padding:7px 10px;font-size:11px;color:#fff;line-height:1.5}
+.ph-out{align-self:flex-end;max-width:82%;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:14px;border-bottom-right-radius:3px;padding:7px 10px;font-size:11px;color:#fff;line-height:1.5}
+.ph-typing{align-self:flex-end;display:flex;gap:3px;padding:8px 11px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:14px;border-bottom-right-radius:3px}
+.ph-t{font-size:9px;color:rgba(255,255,255,.25);margin-top:2px}
+.ph-t.r{text-align:right}
+
+/* TOASTS */
+.toast-area{position:fixed;top:58px;right:14px;z-index:500;display:flex;flex-direction:column;gap:7px;pointer-events:none;width:300px}
+.toast{background:rgba(13,17,23,.97);border:1px solid rgba(255,255,255,.1);border-radius:11px;padding:11px 13px;box-shadow:0 8px 30px rgba(0,0,0,.4);transform:translateX(320px);transition:transform .4s cubic-bezier(.34,1.4,.64,1),opacity .3s;opacity:0;display:flex;gap:9px;pointer-events:auto}
+.toast.show{transform:translateX(0);opacity:1}
+.toast.hide{transform:translateX(320px);opacity:0}
+.t-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.t-title{font-size:11.5px;font-weight:800;color:#fff;margin-bottom:2px}
+.t-body{font-size:11px;color:rgba(255,255,255,.45);line-height:1.4}
+
+/* CONFETTI */
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:9999;display:none}
+
+/* UTILS */
+.flex{display:flex}.aic{align-items:center}.jb{justify-content:space-between}.f1{flex:1}
+.g8{gap:8px}.g10{gap:10px}.g12{gap:12px}
+.mt8{margin-top:8px}.mt10{margin-top:10px}.mt12{margin-top:12px}
+.mb8{margin-bottom:8px}.mb10{margin-bottom:10px}.mb12{margin-bottom:12px}
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
+
+@media(max-width:700px){
+  .hd,.body,.narrator{padding-left:14px;padding-right:14px}
+  .frow,.btype,.svcs,.cmp,.split,.metrics,.stats-row{grid-template-columns:1fr;flex-direction:column}
+  .phone{display:none}
+  .nav-steps{display:none}
+}
+</style>
+</head>
+<body>
+
+<canvas id="confetti"></canvas>
+<div class="toast-area" id="toasts"></div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="nav-icon">A</div>
+    <div class="nav-name">AutoBook<span> AI</span></div>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-sub">Salon Owner Demo</div>
+  <div class="nav-space"></div>
+  <div class="nav-steps" id="nav-steps">
+    <div class="nstep active" onclick="go(0)">Sign Up</div>
+    <div class="nstep" onclick="go(1)">Business</div>
+    <div class="nstep" onclick="go(2)">Services</div>
+    <div class="nstep" onclick="go(3)">AI Setup</div>
+    <div class="nstep" onclick="go(4)">Lead In</div>
+    <div class="nstep" onclick="go(5)">AI Replies</div>
+    <div class="nstep" onclick="go(6)">Booked</div>
+    <div class="nstep" onclick="go(7)">Dashboard</div>
+  </div>
+  <button class="nav-restart" onclick="restart()">↺ Restart</button>
+</nav>
+<div class="prog"><div class="prog-bar" id="prog"></div></div>
+
+<!-- SCENE 0: SIGN UP -->
+<div class="scene on" id="sc0">
+  <div class="hd">
+    <div class="hd-left">
+      <div class="hd-pill">🚀 Step 1 of 8 · Sign Up</div>
+      <div class="hd-title">You discover AutoBook AI<br>and <span class="g">create an account</span></div>
+      <div class="hd-sub">It's Monday morning. You just missed another booking from an unanswered Instagram DM. You search "AI for salons" — and land here.</div>
+    </div>
+    <div class="hd-clock">🕘 9:14 AM · Monday</div>
+  </div>
+  <div class="body">
+    <div class="split">
+      <div class="half">
+        <!-- Browser frame -->
+        <div style="background:#161b22;border-radius:11px;border:1px solid rgba(255,255,255,.08);overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.4)">
+          <div style="background:rgba(255,255,255,.04);padding:8px 12px;display:flex;align-items:center;gap:7px;border-bottom:1px solid rgba(255,255,255,.06)">
+            <div style="display:flex;gap:5px"><div style="width:9px;height:9px;border-radius:50%;background:#ef4444"></div><div style="width:9px;height:9px;border-radius:50%;background:#f59e0b"></div><div style="width:9px;height:9px;border-radius:50%;background:#10b981"></div></div>
+            <div style="flex:1;background:rgba(255,255,255,.05);border-radius:5px;padding:3px 10px;font-size:10.5px;color:rgba(255,255,255,.25);text-align:center;font-family:monospace">app.autobookai.com/signup</div>
+          </div>
+          <div style="padding:16px;background:#f8fafc">
+            <div style="max-width:340px;margin:0 auto">
+              <div style="text-align:center;margin-bottom:14px">
+                <div style="width:36px;height:36px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff;margin:0 auto 7px">A</div>
+                <div style="font-size:16px;font-weight:900;color:#0f172a">Create your account</div>
+                <div style="font-size:11.5px;color:#64748b;margin-top:2px">14-day free trial · No credit card needed</div>
+              </div>
+              <div class="card" style="margin-bottom:9px">
+                <div class="card-bd">
+                  <div class="frow">
+                    <div class="fg"><label class="fl">First Name</label><input class="fi" id="s0f0" readonly></div>
+                    <div class="fg"><label class="fl">Last Name</label><input class="fi" id="s0f1" readonly></div>
+                  </div>
+                  <div class="fg"><label class="fl">Email Address</label><input class="fi" id="s0f2" readonly></div>
+                  <div class="fg"><label class="fl">Phone Number</label><input class="fi" id="s0f3" readonly></div>
+                  <div class="fg" style="margin-bottom:0"><label class="fl">Password</label><input class="fi" type="password" value="••••••••••" readonly></div>
+                </div>
+              </div>
+              <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:7px;padding:7px 11px;font-size:11px;color:#065f46;display:flex;align-items:center;gap:6px">🔒 Your data is secure and never shared.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="half">
+        <div class="info-box">
+          <div class="info-icon">💡</div>
+          <div>
+            <div class="info-title">What's happening</div>
+            <div class="info-body">Jamie Rivera is filling out the sign-up form. No billing info required — just name, email, and phone. AutoBook AI is designed to go live in under 5 minutes from this screen.</div>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,.03);border-radius:10px;border:1px solid rgba(255,255,255,.07);padding:13px 14px">
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:9px">Why 2,400+ salons chose AutoBook AI</div>
+          <div style="display:flex;flex-direction:column;gap:7px">
+            <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:rgba(255,255,255,.6)"><div class="chk">✓</div>No tech skills needed</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:rgba(255,255,255,.6)"><div class="chk">✓</div>Live in under 5 minutes</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:rgba(255,255,255,.6)"><div class="chk">✓</div>Full Growth plan free for 14 days</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:rgba(255,255,255,.6)"><div class="chk">✓</div>AI answers customers 24/7 for you</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:rgba(255,255,255,.6)"><div class="chk">✓</div>Cancel anytime, zero contracts</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="narrator">
+    <div class="nar-av">🎬</div>
+    <div class="nar-body">
+      <div class="nar-label">Demo Guide</div>
+      <div class="nar-text">Click <strong>Create Account</strong> to watch Jamie's details auto-type into the form, then continue to business setup.</div>
+      <div class="nar-btns">
+        <button class="btn-go btn-primary btn-pulse" onclick="runStep0()">▶ Create Account &amp; Continue</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCENE 1: BUSINESS SETUP -->
+<div class="scene" id="sc1">
+  <div class="hd">
+    <div class="hd-left">
+      <div class="hd-pill">🏢 Step 2 of 8 · Business Setup</div>
+      <div class="hd-title">Jamie sets up <span class="g">Luxe Hair Studio</span></div>
+      <div class="hd-sub">Business name, address, type, and hours — entered once, used forever. Your AI will represent your salon perfectly in every single customer conversation.</div>
+    </div>
+    <div class="hd-clock">🕘 9:16 AM · Monday</div>
+  </div>
+  <div class="body">
+    <div class="split">
+      <div class="half" style="flex:1.3">
+        <div style="background:#161b22;border-radius:11px;border:1px solid rgba(255,255,255,.08);overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.4)">
+          <div style="background:rgba(255,255,255,.04);padding:8px 12px;display:flex;align-items:center;gap:7px;border-bottom:1px solid rgba(255,255,255,.06)">
+            <div style="display:flex;gap:5px"><div style="width:9px;height:9px;border-radius:50%;background:#ef4444"></div><div style="width:9px;height:9px;border-radius:50%;background:#f59e0b"></div><div style="width:9px;height:9px;border-radius:50%;background:#10b981"></div></div>
+            <div style="flex:1;background:rgba(255,255,255,.05);border-radius:5px;padding:3px 10px;font-size:10.5px;color:rgba(255,255,255,.25);text-align:center;font-family:monospace">app.autobookai.com/onboarding/business</div>
+          </div>
+          <div style="padding:14px;background:#f8fafc">
+            <div class="card">
+              <div class="card-hd">🏪 Business Type</div>
+              <div class="card-bd">
+                <div class="btype">
+                  <div class="btc sel"><div class="btc-i">✂️</div>Hair Salon</div>
+                  <div class="btc"><div class="btc-i">💈</div>Barber</div>
+                  <div class="btc"><div class="btc-i">💅</div>Nail Salon</div>
+                  <div class="btc"><div class="btc-i">🌸</div>Med Spa</div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-hd">📋 Salon Details</div>
+              <div class="card-bd">
+                <div class="fg"><label class="fl">Salon Name</label><input class="fi" id="s1f0" readonly></div>
+                <div class="frow">
+                  <div class="fg"><label class="fl">City</label><input class="fi" id="s1f1" readonly></div>
+                  <div class="fg"><label class="fl">State</label><input class="fi" id="s1f2" readonly></div>
+                </div>
+                <div class="fg"><label class="fl">Street Address</label><input class="fi" id="s1f3" readonly></div>
+                <div class="frow">
+                  <div class="fg"><label class="fl">Phone</label><input class="fi" id="s1f4" readonly></div>
+                  <div class="fg"><label class="fl">Instagram</label><input class="fi" id="s1f5" readonly></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="half">
+        <div class="dark-card">
+          <div class="dark-card-hd">🕐 Business Hours</div>
+          <div class="dark-card-bd" style="padding:10px 13px">
+            <div class="hr-list">
+              <div class="hr-row"><span class="hr-day">Monday</span><span class="hr-time">9 AM – 7 PM</span><span class="on-badge">Open</span></div>
+              <div class="hr-row"><span class="hr-day">Tuesday</span><span class="hr-time">9 AM – 7 PM</span><span class="on-badge">Open</span></div>
+              <div class="hr-row"><span class="hr-day">Wednesday</span><span class="hr-time">9 AM – 7 PM</span><span class="on-badge">Open</span></div>
+              <div class="hr-row"><span class="hr-day">Thursday</span><span class="hr-time">9 AM – 8 PM</span><span class="on-badge">Open</span></div>
+              <div class="hr-row"><span class="hr-day">Friday</span><span class="hr-time">9 AM – 8 PM</span><span class="on-badge">Open</span></div>
+              <div class="hr-row"><span class="hr-day">Saturday</span><span class="hr-time">10 AM – 6 PM</span><span class="on-badge">Open</span></div>
+              <div class="hr-row"><span class="hr-day">Sunday</span><span class="hr-time">Closed</span><span style="font-size:10px;color:rgba(255,255,255,.25)">—</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="info-box mt10">
+          <div class="info-icon">⚡</div>
+          <div>
+            <div class="info-title">Aria learns your schedule instantly</div>
+            <div class="info-body">When a customer asks "are you open Sunday?" — Aria answers correctly every time using exactly what you set here.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="narrator">
+    <div class="nar-av">🎬</div>
+    <div class="nar-body">
+      <div class="nar-label">Demo Guide</div>
+      <div class="nar-text">The business details are <strong>auto-filling live</strong> — salon name, address, Instagram. Your AI uses all of this when talking to customers. Click <strong>Save &amp; Continue</strong>.</div>
+      <div class="nar-btns">
+        <button class="btn-go btn-primary" onclick="runStep1()">✅ Save Business &amp; Continue →</button>
+        <button class="btn-go btn-ghost" onclick="go(0)">← Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCENE 2: SERVICES -->
+<div class="scene" id="sc2">
+  <div class="hd">
+    <div class="hd-left">
+      <div class="hd-pill">💆 Step 3 of 8 · Services</div>
+      <div class="hd-title">Jamie adds her <span class="g">4 salon services</span></div>
+      <div class="hd-sub">Services, prices, and durations — entered once. From this moment on, Aria quotes these exact numbers to every customer who asks.</div>
+    </div>
+    <div class="hd-clock">🕘 9:18 AM · Monday</div>
+  </div>
+  <div class="body">
+    <div style="background:#f8fafc;border-radius:11px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.08);margin-bottom:12px">
+      <div style="background:#f1f5f9;padding:8px 13px;border-bottom:1px solid #e2e8f0;font-size:11.5px;font-weight:700;color:#334155">💆 Services & Pricing — Luxe Hair Studio</div>
+      <div style="padding:14px">
+        <div style="font-size:12px;font-weight:700;color:#334155;margin-bottom:10px">✅ 4 services added — Aria knows them all</div>
+        <div class="svcs">
+          <div class="svc on"><div class="svc-name">✂️ Cut &amp; Blowout</div><div class="svc-price">$75</div><div class="svc-meta">⏱ 60 min &nbsp;·&nbsp; <span style="color:#10b981;font-weight:700">Added ✓</span></div></div>
+          <div class="svc on"><div class="svc-name">🎨 Full Color</div><div class="svc-price">$140</div><div class="svc-meta">⏱ 120 min &nbsp;·&nbsp; <span style="color:#10b981;font-weight:700">Added ✓</span></div></div>
+          <div class="svc on"><div class="svc-name">💫 Full Highlights</div><div class="svc-price">$180</div><div class="svc-meta">⏱ 150 min &nbsp;·&nbsp; <span style="color:#10b981;font-weight:700">Added ✓</span></div></div>
+          <div class="svc on"><div class="svc-name">🌊 Keratin Treatment</div><div class="svc-price">$220</div><div class="svc-meta">⏱ 180 min &nbsp;·&nbsp; <span style="color:#10b981;font-weight:700">Added ✓</span></div></div>
+        </div>
+        <div style="margin-top:12px;padding:11px 13px;background:#eef2ff;border-radius:8px;border:1px solid #c7d2fe;font-size:12.5px;color:#3730a3;line-height:1.6">
+          🤖 <strong>Aria now knows your full menu.</strong> When Sophie asks "how much are highlights?" tonight at midnight — Aria replies: <em>"Our Full Highlights are $180 and take 2.5 hours — want to book?"</em> in 38 seconds.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="narrator">
+    <div class="nar-av">🎬</div>
+    <div class="nar-body">
+      <div class="nar-label">Demo Guide</div>
+      <div class="nar-text">All 4 services loaded with <strong>exact pricing and duration</strong>. No more "let me check and get back to you" — Aria quotes instantly and accurately, every time.</div>
+      <div class="nar-btns">
+        <button class="btn-go btn-primary" onclick="go(3)">✅ Save Services &amp; Continue →</button>
+        <button class="btn-go btn-ghost" onclick="go(1)">← Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCENE 3: AI SETUP -->
+<div class="scene" id="sc3">
+  <div class="hd">
+    <div class="hd-left">
+      <div class="hd-pill">🤖 Step 4 of 8 · AI Setup</div>
+      <div class="hd-title">Meet <span class="g">Aria</span> — your AI front desk</div>
+      <div class="hd-sub">Name her, set the tone, flip the automation switches. One click and Aria goes live — answering messages 24/7 and booking appointments automatically.</div>
+    </div>
+    <div class="hd-clock">🕘 9:20 AM · Monday</div>
+  </div>
+  <div class="body">
+    <div class="split">
+      <div class="half">
+        <div class="dark-card">
+          <div class="dark-card-hd">🤖 AI Identity</div>
+          <div class="dark-card-bd">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+              <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🤖</div>
+              <div>
+                <div style="font-size:16px;font-weight:900;color:#fff">Aria</div>
+                <div style="font-size:11px;color:rgba(255,255,255,.35)">Friendly &amp; Professional · Luxe Hair Studio</div>
+              </div>
+            </div>
+            <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:10px;font-size:12px;color:rgba(255,255,255,.6);line-height:1.65">
+              "Hi! 💫 Welcome to <strong style="color:#fff">Luxe Hair Studio</strong>! I'm Aria, your 24/7 AI receptionist. I can book appointments, answer pricing questions, or check availability. What can I help you with today? ✨"
+            </div>
+          </div>
+        </div>
+        <div class="dark-card">
+          <div class="dark-card-hd">⚡ Automations — All Active</div>
+          <div class="dark-card-bd" style="padding:10px 13px">
+            <div class="tgl-list">
+              <div class="tgl"><span class="tgl-lbl">Auto-book appointments</span><span class="tgl-on">ON</span></div>
+              <div class="tgl"><span class="tgl-lbl">24-hour SMS reminder</span><span class="tgl-on">ON</span></div>
+              <div class="tgl"><span class="tgl-lbl">Missed lead follow-up (2hr)</span><span class="tgl-on">ON</span></div>
+              <div class="tgl"><span class="tgl-lbl">After-hours auto-reply</span><span class="tgl-on">ON</span></div>
+              <div class="tgl" style="border-bottom:none"><span class="tgl-lbl">Review request (post-visit)</span><span class="tgl-on">ON</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="half">
+        <div class="info-box">
+          <div class="info-icon">⚡</div>
+          <div>
+            <div class="info-title">What "Activate Aria" means</div>
+            <div class="info-body">The second you click activate, Aria goes live on Instagram DMs, your website chat, and SMS. She handles every message — including at 2am on a Sunday — while you focus on your clients.</div>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,.03);border-radius:10px;border:1px solid rgba(255,255,255,.07);padding:14px;text-align:center;margin-bottom:10px">
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Total setup time so far</div>
+          <div style="font-size:44px;font-weight:900;color:#a5b4fc;line-height:1">4:12</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.3);margin-top:4px">minutes from signup to AI going live</div>
+        </div>
+        <div style="background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.15);border-radius:9px;padding:12px 13px">
+          <div style="font-size:11px;font-weight:700;color:#6ee7b7;margin-bottom:7px">After activation, Aria will:</div>
+          <div style="display:flex;flex-direction:column;gap:5px;font-size:12px;color:rgba(255,255,255,.5)">
+            <div>✅ Reply to every message in under 60 seconds</div>
+            <div>✅ Quote exact prices and service durations</div>
+            <div>✅ Book appointments when customers are ready</div>
+            <div>✅ Send reminders and follow-ups automatically</div>
+            <div>✅ Recover missed leads while you're offline</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="narrator">
+    <div class="nar-av">🎬</div>
+    <div class="nar-body">
+      <div class="nar-label">Demo Guide</div>
+      <div class="nar-text">Every automation is <strong>on by default</strong>. One click and Aria goes live for Luxe Hair Studio — right now.</div>
+      <div class="nar-btns">
+        <button class="btn-go btn-primary btn-pulse" onclick="activateAria()">🚀 Activate Aria — Go Live!</button>
+        <button class="btn-go btn-ghost" onclick="go(2)">← Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCENE 4: LEAD ARRIVES -->
+<div class="scene" id="sc4">
+  <div class="hd">
+    <div class="hd-left">
+      <div class="hd-pill">📲 Step 5 of 8 · New Lead</div>
+      <div class="hd-title">11:47 PM — a lead arrives <span class="g">while Jamie sleeps</span></div>
+      <div class="hd-sub">Sophie Kim finds Luxe Hair Studio on Instagram and DMs asking about highlights. It's almost midnight. Without AutoBook AI, this $180 booking is gone by morning.</div>
+    </div>
+    <div class="hd-clock">🌙 11:47 PM · Monday</div>
+  </div>
+  <div class="body">
+    <div class="split">
+      <div class="half">
+        <div class="phone">
+          <div class="ph-notch"><div class="ph-bar"></div></div>
+          <div style="background:#111">
+            <div class="ph-status"><span>11:47 PM</span><span>●●●● 🔋</span></div>
+            <div class="ph-content">
+              <div class="ph-header">
+                <div style="width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#ef4444);display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;color:#fff;flex-shrink:0">SK</div>
+                <div>
+                  <div class="ph-name">Sophie Kim</div>
+                  <div class="ph-sub">Instagram · Active 1h ago</div>
+                </div>
+              </div>
+              <div class="ph-chat">
+                <div>
+                  <div class="ph-in">Hi! How much do you charge for highlights? Do you have anything this Saturday? 😊</div>
+                  <div class="ph-t">11:47 PM</div>
+                </div>
+                <div style="align-self:flex-end">
+                  <div class="ph-typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+                  <div class="ph-t r">Aria · Luxe Hair Studio</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="half">
+        <div class="cmp">
+          <div class="cmp-no">
+            <div class="cmp-title" style="color:#fca5a5">😩 Without AutoBook AI</div>
+            <div class="cmp-item">❌ Message sits unread all night</div>
+            <div class="cmp-item">❌ Sophie waits 9+ hours</div>
+            <div class="cmp-item">❌ She books a competitor</div>
+            <div class="cmp-item">❌ $180 lost forever</div>
+          </div>
+          <div class="cmp-yes">
+            <div class="cmp-title" style="color:#6ee7b7">🤖 With AutoBook AI</div>
+            <div class="cmp-item">✅ Aria replies in <strong style="color:#fff">38 seconds</strong></div>
+            <div class="cmp-item">✅ Price quoted instantly</div>
+            <div class="cmp-item">✅ Saturday slots offered</div>
+            <div class="cmp-item">✅ Booking confirmed by midnight</div>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,.03);border-radius:9px;border:1px solid rgba(255,255,255,.07);padding:12px 13px;display:flex;gap:10px;align-items:center;margin-bottom:10px">
+          <div style="font-size:32px">😴</div>
+          <div>
+            <div style="font-size:12.5px;font-weight:700;color:#fff">Jamie is fast asleep</div>
+            <div style="font-size:11.5px;color:rgba(255,255,255,.4);margin-top:2px">11:47 PM. Phone on silent. Aria has the front desk covered.</div>
+          </div>
+        </div>
+        <div class="info-box">
+          <div class="info-icon">⚡</div>
+          <div>
+            <div class="info-title">Aria detected the lead instantly</div>
+            <div class="info-body">The moment Sophie sent her DM, Aria scanned it, matched "highlights" to the $180 service, checked the Saturday calendar, and started composing a reply — all before Jamie knew a message arrived.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="narrator">
+    <div class="nar-av">🎬</div>
+    <div class="nar-body">
+      <div class="nar-label">Demo Guide</div>
+      <div class="nar-text">It's midnight. Sophie messaged. <strong>Aria is already typing</strong> — you can see the dots on Sophie's screen right now. Click below to watch the full conversation unfold live.</div>
+      <div class="nar-btns">
+        <button class="btn-go btn-primary btn-pulse" onclick="go(5)">👀 Watch Aria Reply Live →</button>
+        <button class="btn-go btn-ghost" onclick="go(3)">← Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCENE 5: AI REPLIES LIVE -->
+<div class="scene" id="sc5">
+  <div class="hd">
+    <div class="hd-left">
+      <div class="hd-pill">💬 Step 6 of 8 · AI Replies</div>
+      <div class="hd-title">Aria <span class="g">handles the full conversation</span></div>
+      <div class="hd-sub">Watch every message appear in real time. Aria answers Sophie's question, quotes the price, offers slots, collects her details — and creates the booking. Zero human involvement.</div>
+    </div>
+    <div class="hd-clock">🌙 11:47 PM – 11:53 PM</div>
+  </div>
+  <div class="body">
+    <div class="split">
+      <div class="half" style="flex:1.2">
+        <div class="chat">
+          <div class="chat-top">
+            <div class="chat-av" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);font-size:13px">🤖</div>
+            <div style="flex:1">
+              <div class="chat-name">Aria · Luxe Hair Studio</div>
+              <div class="chat-status">Live · AI Active · Handling Sophie Kim</div>
+            </div>
+            <span class="badge bg-green" style="font-size:9px">● LIVE</span>
+          </div>
+          <div class="msgs" id="chatbox"></div>
+          <div style="padding:8px 12px;background:rgba(255,255,255,.02);border-top:1px solid rgba(255,255,255,.05);font-size:10.5px;color:rgba(255,255,255,.2);display:flex;align-items:center;gap:6px">🤖 Aria is handling this · Avg response: 38s</div>
+        </div>
+      </div>
+      <div class="half">
+        <div class="tracker" id="tracker">
+          <div class="tracker-h">Live Conversation Stats</div>
+          <div class="tr-row"><span class="tr-lbl">Messages exchanged</span><strong class="tr-val" id="tr0">0</strong></div>
+          <div class="tr-row"><span class="tr-lbl">Aria response time</span><strong class="tr-val lit">38 seconds</strong></div>
+          <div class="tr-row"><span class="tr-lbl">Pricing quoted</span><strong class="tr-val" id="tr1">—</strong></div>
+          <div class="tr-row"><span class="tr-lbl">Time slots offered</span><strong class="tr-val" id="tr2">—</strong></div>
+          <div class="tr-row"><span class="tr-lbl">Customer info collected</span><strong class="tr-val" id="tr3">—</strong></div>
+          <div class="tr-row"><span class="tr-lbl">Booking status</span><strong class="tr-val" id="tr4">—</strong></div>
+        </div>
+        <div class="bk" id="bk-card" style="display:none">
+          <div class="bk-title">🎉 Booking Being Created</div>
+          <div class="bk-row"><span class="bk-l">Customer</span><span class="bk-v">Sophie Kim</span></div>
+          <div class="bk-row"><span class="bk-l">Service</span><span class="bk-v">Full Highlights · $180</span></div>
+          <div class="bk-row"><span class="bk-l">Date &amp; Time</span><span class="bk-v">Sat May 10 · 10:00 AM</span></div>
+          <div class="bk-row"><span class="bk-l">Handled by</span><span class="bk-v" style="color:#a5b4fc">🤖 Aria (AI)</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="narrator" id="nar5">
+    <div class="nar-av">🎬</div>
+    <div class="nar-body">
+      <div class="nar-label">Demo Guide</div>
+      <div class="nar-text" id="nar5text">The chat is <strong>playing in real time</strong>. Watch each message appear with realistic timing — exactly how it happens for your real customers at midnight.</div>
+      <div class="nar-btns" id="nar5btns" style="display:none">
+        <button class="btn-go btn-primary" onclick="go(6)">✅ View Booking Confirmation →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCENE 6: BOOKING CONFIRMED -->
+<div class="scene" id="sc6">
+  <div class="hd">
+    <div class="hd-left">
+      <div class="hd-pill">✅ Step 7 of 8 · Confirmed!</div>
+      <div class="hd-title">$180 booked — <span class="g">Jamie never woke up</span></div>
+      <div class="hd-sub">Aria confirmed the appointment, sent Sophie a confirmation SMS, and scheduled a Friday reminder — all at 11:53 PM while Jamie slept soundly.</div>
+    </div>
+    <div class="hd-clock">🌙 11:53 PM · Monday</div>
+  </div>
+  <div class="body">
+    <div class="split">
+      <div class="half">
+        <div class="chat" style="margin-bottom:12px">
+          <div class="chat-top">
+            <div class="chat-av" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);font-size:13px">🤖</div>
+            <div><div class="chat-name">Aria's final message</div><div class="chat-status">Booking complete · 11:53 PM</div></div>
+          </div>
+          <div class="msgs" style="min-height:auto">
+            <div class="msg r">
+              <div class="m-av" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">SK</div>
+              <div><div class="m-bubble">Saturday 10am is perfect! Sophie Kim, (323) 555-0192 🙌</div><div class="m-time" style="text-align:right">11:52 PM</div></div>
+            </div>
+            <div class="msg">
+              <div class="m-av" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);font-size:12px">🤖</div>
+              <div>
+                <div class="m-bubble">🎉 <strong style="color:#fff">You're all booked, Sophie!</strong><br><br>📋 Full Highlights · 2.5 hours<br>📅 Saturday, May 10 at 10:00 AM<br>📍 Luxe Hair Studio · 4820 Sunset Blvd<br>💰 $180<br><br>Reminder sent Friday evening. Can't wait to see you! ✨</div>
+                <div class="m-time">11:53 PM · Aria · 38s response</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,.03);border-radius:9px;border:1px solid rgba(255,255,255,.07);padding:11px 13px">
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">What Aria handled automatically</div>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:rgba(255,255,255,.55)">
+            <div>✅ Booking added to Jamie's calendar</div>
+            <div>✅ Confirmation SMS sent to Sophie</div>
+            <div>⏰ Reminder: Friday May 9 at 6:00 PM</div>
+            <div>⭐ Review request: Saturday 1:30 PM</div>
+          </div>
+        </div>
+      </div>
+      <div class="half">
+        <div class="bk" style="margin-bottom:12px">
+          <div class="bk-title">🎉 Booking Confirmed</div>
+          <div class="bk-row"><span class="bk-l">Customer</span><span class="bk-v">Sophie Kim</span></div>
+          <div class="bk-row"><span class="bk-l">Phone</span><span class="bk-v">(323) 555-0192</span></div>
+          <div class="bk-row"><span class="bk-l">Service</span><span class="bk-v">Full Highlights</span></div>
+          <div class="bk-row"><span class="bk-l">Date</span><span class="bk-v">Saturday, May 10</span></div>
+          <div class="bk-row"><span class="bk-l">Time</span><span class="bk-v">10:00 AM</span></div>
+          <div class="bk-row"><span class="bk-l">Duration</span><span class="bk-v">2.5 hours</span></div>
+          <div class="bk-row"><span class="bk-l">Price</span><span class="bk-v" style="color:#6ee7b7;font-size:15px;font-weight:900">$180</span></div>
+          <div class="bk-row"><span class="bk-l">Source</span><span class="bk-v">Instagram DM</span></div>
+          <div class="bk-row"><span class="bk-l">Booked by</span><span class="bk-v" style="color:#a5b4fc">🤖 Aria (AI)</span></div>
+          <div class="bk-status"><div class="bk-dot"></div>Confirmed · Zero effort from Jamie</div>
+        </div>
+        <div style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.15);border-radius:9px;padding:13px;text-align:center">
+          <div style="font-size:10px;font-weight:700;color:rgba(110,231,183,.6);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px">Jamie's time spent on this booking</div>
+          <div style="font-size:48px;font-weight:900;color:#6ee7b7;line-height:1">0</div>
+          <div style="font-size:12px;color:#6ee7b7;font-weight:700">minutes</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.3);margin-top:4px">Aria handled 100% of this</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="narrator">
+    <div class="nar-av">🎬</div>
+    <div class="nar-body">
+      <div class="nar-label">Demo Guide</div>
+      <div class="nar-text">The booking is <strong>confirmed, in the calendar, and followed up</strong> — and Jamie slept through the whole thing. Click to see what she wakes up to Tuesday morning.</div>
+      <div class="nar-btns">
+        <button class="btn-go btn-primary" onclick="go(7)">📊 View Jamie's Morning Dashboard →</button>
+        <button class="btn-go btn-ghost" onclick="go(5)">← Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCENE 7: DASHBOARD -->
+<div class="scene" id="sc7">
+  <div class="hd">
+    <div class="hd-left">
+      <div class="hd-pill">📊 Step 8 of 8 · Dashboard</div>
+      <div class="hd-title">Tuesday 8:30 AM — <span class="g">Jamie wakes up to this</span></div>
+      <div class="hd-sub">Jamie opens AutoBook AI over morning coffee. Sophie's booking is there. Aria handled 4 conversations overnight. The day is already profitable before she picks up a brush.</div>
+    </div>
+    <div class="hd-clock">☀️ 8:30 AM · Tuesday</div>
+  </div>
+  <div class="body">
+    <div class="dash-wrap">
+      <div class="dash-banner">
+        <div>
+          <div class="dash-banner-text">Good morning, Jamie! ☀️</div>
+          <div class="dash-banner-sub">Aria handled 4 conversations overnight · 1 new booking · 0 missed leads</div>
+        </div>
+        <div class="dash-live">🤖 Aria Online</div>
+      </div>
+      <div class="stats-row">
+        <div class="stat"><div class="stat-val" style="color:#a5b4fc">5</div><div class="stat-lbl">Appts Today</div><div class="stat-trend">↑ +1 overnight</div></div>
+        <div class="stat"><div class="stat-val" style="color:#6ee7b7">$755</div><div class="stat-lbl">Revenue Today</div><div class="stat-trend">↑ +$180 from Aria</div></div>
+        <div class="stat"><div class="stat-val" style="color:#fcd34d">96%</div><div class="stat-lbl">AI Response Rate</div><div class="stat-trend">38s avg reply</div></div>
+      </div>
+      <div class="sched">
+        <div class="sched-hd">📅 Today's Schedule</div>
+        <div class="sched-row"><div class="sched-time">9:00 AM</div><div class="sched-bar" style="background:#6366f1"></div><div style="flex:1"><div class="sched-name">Mia Torres</div><div class="sched-svc">Cut &amp; Blowout · $75</div></div><span class="sched-badge bg-green">Confirmed</span></div>
+        <div class="sched-row"><div class="sched-time">11:00 AM</div><div class="sched-bar" style="background:#10b981"></div><div style="flex:1"><div class="sched-name">Alex Chen</div><div class="sched-svc">Full Color · $140</div></div><span class="sched-badge bg-green">Confirmed</span></div>
+        <div class="sched-row"><div class="sched-time">1:30 PM</div><div class="sched-bar" style="background:#f59e0b"></div><div style="flex:1"><div class="sched-name">Chloe Park</div><div class="sched-svc">Highlights · $180</div></div><span class="sched-badge bg-yellow">Pending</span></div>
+        <div class="sched-row"><div class="sched-time">3:30 PM</div><div class="sched-bar" style="background:#8b5cf6"></div><div style="flex:1"><div class="sched-name">Dana Ellis</div><div class="sched-svc">Keratin · $220</div></div><span class="sched-badge bg-green">Confirmed</span></div>
+        <div class="sched-row highlight"><div class="sched-time" style="color:#a5b4fc">Sat 10 AM</div><div class="sched-bar" style="background:linear-gradient(180deg,#6366f1,#8b5cf6)"></div><div style="flex:1"><div class="sched-name">Sophie Kim ✨ <span style="font-size:9.5px;background:rgba(99,102,241,.2);color:#c4b5fd;padding:1px 6px;border-radius:6px;font-weight:700">Booked by Aria</span></div><div class="sched-svc">Full Highlights · $180 · Via Instagram DM at 11:53 PM</div></div><span class="sched-badge bg-purple">Just Booked</span></div>
+      </div>
+      <div class="log">
+        <div class="log-hd">🤖 Aria's Overnight Log</div>
+        <div class="log-item"><div class="log-dot" style="background:#a5b4fc"></div><div class="log-time">11:53 PM</div><div><div class="log-text">Booking confirmed — Sophie Kim</div><div class="log-sub">Full Highlights · Sat 10am · $180 · Instagram DM</div></div></div>
+        <div class="log-item"><div class="log-dot" style="background:#6ee7b7"></div><div class="log-time">11:47 PM</div><div><div class="log-text">New lead captured — replied in 38s</div><div class="log-sub">Sophie Kim · Instagram DM · Highlights inquiry</div></div></div>
+        <div class="log-item"><div class="log-dot" style="background:#fcd34d"></div><div class="log-time">10:12 PM</div><div><div class="log-text">After-hours inquiry handled</div><div class="log-sub">"What are your hours?" — Answered instantly</div></div></div>
+        <div class="log-item" style="border-bottom:none"><div class="log-dot" style="background:#f9a8d4"></div><div class="log-time">9:30 PM</div><div><div class="log-text">24hr reminder sent — Mia Torres</div><div class="log-sub">Cut &amp; Blowout tomorrow 9am · SMS delivered</div></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="narrator">
+    <div class="nar-av">🎬</div>
+    <div class="nar-body">
+      <div class="nar-label">Demo Guide</div>
+      <div class="nar-text">This is what Jamie sees every morning — <strong>everything Aria did overnight</strong>, all in one view. Sophie's booking is there. Reminders sent. Zero missed leads. Click below to see the full results! 🎉</div>
+      <div class="nar-btns">
+        <button class="btn-go btn-primary btn-pulse" onclick="showSuccess()">🎉 See Full Results!</button>
+        <button class="btn-go btn-ghost" onclick="go(6)">← Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCENE 8: SUCCESS -->
+<div class="scene" id="sc8">
+  <div class="success">
+    <div class="succ-emoji">🎉</div>
+    <div class="succ-h">Journey Complete!</div>
+    <div class="succ-sub">In <strong style="color:#a5b4fc">4 minutes and 12 seconds</strong>, Jamie signed up, set up her salon, activated her AI, captured a midnight lead, and woke up with a confirmed <strong style="color:#6ee7b7">$180 booking</strong> — without spending a single minute on it herself.</div>
+    <div class="metrics">
+      <div class="met"><div class="met-v" style="color:#6ee7b7">$180</div><div class="met-l">Revenue captured overnight</div></div>
+      <div class="met"><div class="met-v" style="color:#a5b4fc">38s</div><div class="met-l">Aria's reply time</div></div>
+      <div class="met"><div class="met-v" style="color:#fcd34d">0 min</div><div class="met-l">Jamie's time spent</div></div>
+    </div>
+    <div class="recap">
+      <div class="recap-h">Full Journey Recap — 8 Steps</div>
+      <div class="recap-row"><div class="chk">✓</div><span><strong>Signed up</strong> — 14-day trial, no credit card, live in minutes</span></div>
+      <div class="recap-row"><div class="chk">✓</div><span><strong>Set up Luxe Hair Studio</strong> — name, address, type, hours</span></div>
+      <div class="recap-row"><div class="chk">✓</div><span><strong>Added 4 services</strong> — Aria knows every price &amp; duration</span></div>
+      <div class="recap-row"><div class="chk">✓</div><span><strong>Activated Aria</strong> — AI receptionist live at 9:20 AM</span></div>
+      <div class="recap-row"><div class="chk">✓</div><span><strong>Lead captured at 11:47 PM</strong> — Sophie Kim via Instagram DM</span></div>
+      <div class="recap-row"><div class="chk">✓</div><span><strong>Aria replied in 38 seconds</strong> — quoted $180, offered Saturday slots</span></div>
+      <div class="recap-row"><div class="chk">✓</div><span><strong>Booking confirmed at 11:53 PM</strong> — Sat May 10, 10am, $180</span></div>
+      <div class="recap-row"><div class="chk">✓</div><span><strong>Dashboard live</strong> — Jamie sees everything at 8:30 AM with zero effort</span></div>
+    </div>
+    <div class="succ-btns">
+      <button class="sbtn sbtn-p" onclick="restart()">🔄 Restart Demo</button>
+      <a href="autobook-ai.html" class="sbtn sbtn-g">📊 Full App Dashboard</a>
+      <a href="autobook-landing.html" class="sbtn sbtn-g">🏠 Landing Page</a>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── STATE ── */
+let cur = 0, chatPlayed = false;
+
+/* ── NAVIGATION ── */
+function go(n) {
+  document.querySelectorAll('.scene').forEach(s => s.classList.remove('on'));
+  const sc = document.getElementById('sc' + n);
+  if (sc) { sc.classList.add('on'); }
+  cur = n;
+  updateUI();
+  window.scrollTo(0, 0);
+  if (n === 1) { setTimeout(fillBiz, 200); }
+  if (n === 5 && !chatPlayed) { chatPlayed = true; setTimeout(runChat, 600); }
+}
+
+function restart() {
+  chatPlayed = false;
+  document.getElementById('chatbox').innerHTML = '';
+  resetTracker();
+  const ids = ['s0f0','s0f1','s0f2','s0f3','s1f0','s1f1','s1f2','s1f3','s1f4','s1f5'];
+  ids.forEach(id => { const el = document.getElementById(id); if (el) { el.value = ''; el.className = 'fi'; } });
+  go(0);
+}
+
+function updateUI() {
+  const pct = (cur / 8) * 100;
+  document.getElementById('prog').style.width = pct + '%';
+  document.querySelectorAll('.nstep').forEach((p, i) => {
+    p.classList.remove('active', 'done');
+    if (i < cur) p.classList.add('done');
+    else if (i === cur) p.classList.add('active');
+  });
+}
+
+/* ── TYPEWRITER ── */
+function type(id, val, delay) {
+  setTimeout(() => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add('typing'); el.value = '';
+    let i = 0;
+    const iv = setInterval(() => {
+      if (i >= val.length) { clearInterval(iv); el.classList.remove('typing'); el.classList.add('filled'); return; }
+      el.value += val[i++];
+    }, 28);
+  }, delay);
+}
+
+/* ── STEP 0 ── */
+function runStep0() {
+  type('s0f0', 'Jamie', 0);
+  type('s0f1', 'Rivera', 340);
+  type('s0f2', 'jamie@luxehairstudio.com', 680);
+  type('s0f3', '(310) 555-0182', 1060);
+  setTimeout(() => {
+    showToast('🎉', 'rgba(99,102,241,.2)', 'Account Created!', 'Welcome to AutoBook AI, Jamie! Your 14-day trial has started.');
+    setTimeout(() => go(1), 1100);
+  }, 1800);
+}
+
+/* ── STEP 1 ── */
+function fillBiz() {
+  const data = { s1f0:'Luxe Hair Studio', s1f1:'Los Angeles', s1f2:'CA', s1f3:'4820 Sunset Blvd, Suite 2', s1f4:'(310) 555-0182', s1f5:'@luxehairstudio' };
+  let d = 0;
+  for (const [id, val] of Object.entries(data)) {
+    const el = document.getElementById(id);
+    if (el && !el.value) { type(id, val, d); d += 300; }
+  }
+}
+
+function runStep1() {
+  fillBiz();
+  setTimeout(() => {
+    showToast('✅', 'rgba(16,185,129,.2)', 'Business Saved!', 'Luxe Hair Studio is set up and ready for Aria.');
+    setTimeout(() => go(2), 900);
+  }, 2000);
+}
+
+/* ── STEP 3 ── */
+function activateAria() {
+  showToast('🤖', 'rgba(99,102,241,.2)', 'Aria is LIVE!', 'Your AI receptionist is now online for Luxe Hair Studio — 24/7.');
+  setTimeout(() => {
+    go(4);
+    setTimeout(() => {
+      showToast('📲', 'rgba(245,158,11,.18)', 'New Lead at 11:47 PM!', 'Sophie Kim messaged: "How much for highlights?"');
+    }, 2400);
+  }, 900);
+}
+
+/* ── CHAT SCRIPT ── */
+const CHAT_MSGS = [
+  { who: 'user', av: 'SK', bg: 'linear-gradient(135deg,#f59e0b,#ef4444)', text: 'Hi! How much do you charge for highlights? Do you have anything available this Saturday? 😊', time: '11:47 PM', delay: 0 },
+  { who: 'ai', text: 'Hi Sophie! ✨ Welcome to <strong style="color:#fff">Luxe Hair Studio</strong>! I\'m Aria, your 24/7 AI receptionist.\n\nOur <strong style="color:#fff">Full Highlights</strong> are <strong style="color:#fff">$180</strong> and take about 2.5 hours.\n\nFor this Saturday I have:\n📅 <strong style="color:#fff">Sat May 10</strong> — 9:00 AM, 10:00 AM, 1:00 PM\n\nShall I book one for you? 😊', time: '11:47 PM · 38s', delay: 1800 },
+  { who: 'user', av: 'SK', bg: 'linear-gradient(135deg,#f59e0b,#ef4444)', text: '10am on Saturday sounds perfect!', time: '11:49 PM', delay: 3600 },
+  { who: 'ai', text: 'Amazing choice! 🎉 Just need a couple of details to confirm:\n\n• <strong style="color:#fff">Your full name?</strong>\n• <strong style="color:#fff">Best phone number?</strong>', time: '11:49 PM · 38s', delay: 5400 },
+  { who: 'user', av: 'SK', bg: 'linear-gradient(135deg,#f59e0b,#ef4444)', text: 'Sophie Kim, (323) 555-0192 🙌', time: '11:51 PM', delay: 7200 },
+  { who: 'ai', text: '🎉 <strong style="color:#fff">You\'re all booked, Sophie!</strong>\n\n📋 Full Highlights · 2.5 hours\n📅 Saturday, May 10 at 10:00 AM\n📍 Luxe Hair Studio · 4820 Sunset Blvd\n💰 $180\n\nA confirmation SMS has been sent and a reminder will come Friday evening. Can\'t wait to see you! ✨', time: '11:53 PM · 38s', delay: 9200 },
+];
+
+const STAT_STEPS = [
+  { msgs: 1 },
+  { msgs: 2, price: '$180 ✓', slots: '3 options ✓' },
+  { msgs: 3 },
+  { msgs: 4 },
+  { msgs: 5, info: 'Sophie Kim · (323) 555-0192 ✓' },
+  { msgs: 6, book: 'Confirmed! ✓', showCard: true },
+];
+
+function resetTracker() {
+  document.getElementById('tr0').textContent = '0'; document.getElementById('tr0').className = 'tr-val';
+  ['tr1','tr2','tr3','tr4'].forEach(id => { const el = document.getElementById(id); if (el) { el.textContent = '—'; el.className = 'tr-val'; } });
+  const bk = document.getElementById('bk-card'); if (bk) bk.style.display = 'none';
+  const nb = document.getElementById('nar5btns'); if (nb) nb.style.display = 'none';
+}
+
+let chatTimers = [];
+
+function runChat() {
+  const box = document.getElementById('chatbox');
+  if (!box) return;
+  box.innerHTML = ''; resetTracker();
+  chatTimers.forEach(t => clearTimeout(t)); chatTimers = [];
+
+  CHAT_MSGS.forEach((msg, idx) => {
+    if (msg.who === 'ai') {
+      chatTimers.push(setTimeout(() => addTyping(box), msg.delay));
+      chatTimers.push(setTimeout(() => {
+        removeTyping(box); addMsg(box, msg); applyStats(idx);
+        if (idx === CHAT_MSGS.length - 1) {
+          setTimeout(() => {
+            showToast('✅', 'rgba(16,185,129,.2)', 'Booking Confirmed!', 'Sophie Kim — Full Highlights, Sat 10am · $180');
+            const nb = document.getElementById('nar5btns'); if (nb) nb.style.display = 'flex';
+          }, 600);
+        }
+      }, msg.delay + 1500));
+    } else {
+      chatTimers.push(setTimeout(() => { addMsg(box, msg); applyStats(idx); }, msg.delay));
+    }
+  });
+}
+
+function addTyping(box) {
+  const row = document.createElement('div'); row.id = 'typing'; row.className = 'typing-wrap';
+  row.innerHTML = '<div class="m-av" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);font-size:12px;width:24px;height:24px;margin-top:2px;flex-shrink:0">🤖</div><div class="t-bub"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  box.appendChild(row); box.scrollTop = box.scrollHeight;
+}
+
+function removeTyping(box) { const t = box.querySelector('#typing'); if (t) t.remove(); }
+
+function addMsg(box, msg) {
+  const row = document.createElement('div');
+  row.className = 'msg' + (msg.who === 'user' ? ' r' : '');
+  const fmt = msg.text.replace(/\n/g, '<br>');
+  if (msg.who === 'ai') {
+    row.innerHTML = `<div class="m-av" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);font-size:12px;width:24px;height:24px;flex-shrink:0;margin-top:2px">🤖</div><div><div class="m-bubble">${fmt}</div><div class="m-time">${msg.time}</div></div>`;
+  } else {
+    row.innerHTML = `<div class="m-av" style="background:${msg.bg};width:24px;height:24px;font-size:9.5px;flex-shrink:0;margin-top:2px">${msg.av}</div><div><div class="m-bubble">${fmt}</div><div class="m-time" style="text-align:right">${msg.time}</div></div>`;
+  }
+  row.style.cssText = 'opacity:0;transform:translateY(6px);transition:all .3s';
+  box.appendChild(row);
+  setTimeout(() => { row.style.opacity = '1'; row.style.transform = 'none'; }, 20);
+  box.scrollTop = box.scrollHeight;
+}
+
+function applyStats(idx) {
+  const s = STAT_STEPS[idx];
+  if (!s) return;
+  const set = (id, v) => { const el = document.getElementById(id); if (el) { el.textContent = v; el.className = 'tr-val lit'; } };
+  if (s.msgs !== undefined) { const el = document.getElementById('tr0'); if (el) { el.textContent = s.msgs; el.className = 'tr-val lit'; } }
+  if (s.price) set('tr1', s.price);
+  if (s.slots) set('tr2', s.slots);
+  if (s.info) set('tr3', s.info);
+  if (s.book) set('tr4', s.book);
+  if (s.showCard) { const bk = document.getElementById('bk-card'); if (bk) { bk.style.display = 'block'; bk.style.animation = 'up .4s ease'; } }
+}
+
+/* ── SUCCESS + CONFETTI ── */
+function showSuccess() { go(8); setTimeout(fireConfetti, 350); }
+
+function fireConfetti() {
+  const cv = document.getElementById('confetti');
+  cv.style.display = 'block';
+  const ctx = cv.getContext('2d');
+  cv.width = window.innerWidth; cv.height = window.innerHeight;
+  const colors = ['#6366f1','#8b5cf6','#ec4899','#10b981','#f59e0b','#a5b4fc','#fcd34d','#6ee7b7'];
+  const ps = Array.from({ length: 150 }, () => ({
+    x: Math.random() * cv.width,
+    y: Math.random() * cv.height - cv.height,
+    w: Math.random() * 9 + 4, h: Math.random() * 5 + 2,
+    c: colors[Math.floor(Math.random() * colors.length)],
+    r: Math.random() * Math.PI * 2, rv: (Math.random() - .5) * .1,
+    vy: Math.random() * 3 + 1.5, vx: (Math.random() - .5) * 1.5
+  }));
+  let f = 0;
+  const draw = () => {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    ps.forEach(p => {
+      ctx.save(); ctx.translate(p.x + p.w / 2, p.y + p.h / 2); ctx.rotate(p.r);
+      ctx.fillStyle = p.c; ctx.globalAlpha = Math.max(0, 1 - f / 160);
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); ctx.restore();
+      p.y += p.vy; p.x += p.vx; p.r += p.rv;
+    });
+    if (++f < 175) requestAnimationFrame(draw);
+    else cv.style.display = 'none';
+  };
+  draw();
+}
+
+/* ── TOAST ── */
+function showToast(icon, ibg, title, body) {
+  const stack = document.getElementById('toasts');
+  const el = document.createElement('div'); el.className = 'toast';
+  el.innerHTML = `<div class="t-icon" style="background:${ibg}">${icon}</div><div><div class="t-title">${title}</div><div class="t-body">${body}</div></div>`;
+  stack.appendChild(el);
+  requestAnimationFrame(() => { requestAnimationFrame(() => el.classList.add('show')); });
+  setTimeout(() => { el.classList.remove('show'); el.classList.add('hide'); setTimeout(() => el.remove(), 400); }, 4000);
+}
+
+/* ── INIT ── */
+updateUI();
+</script>
+</body>
+</html>

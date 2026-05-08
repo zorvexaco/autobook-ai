@@ -1,0 +1,75 @@
+{
+  "business": {
+    "name": "GlowHaus Med Spa",
+    "owner": "Natalie Park",
+    "location": "8712 Melrose Ave, West Hollywood, CA 90069",
+    "phone": "(310) 555-0100",
+    "email": "hello@glowhausmedspa.com",
+    "plan": "Growth",
+    "aiReceptionist": "Aria"
+  },
+  "customers": [
+    {"id":"cus_1001","name":"Isabelle Fontaine","email":"isabelle.f@email.com","phone":"(310) 555-0121","status":"VIP","lifetimeValue":2405,"lastVisit":"2025-05-08","nextAppointment":"2025-05-16 09:00","preferredServices":["Hydrafacial Signature","Microneedling + PRP"],"notes":"Prefers morning appointments and fragrance-free products."},
+    {"id":"cus_1002","name":"Chloe Nakamura","email":"chloe.n@email.com","phone":"(310) 555-0134","status":"VIP","lifetimeValue":1960,"lastVisit":"2025-05-08","nextAppointment":"2025-05-19 12:00","preferredServices":["Laser Hair Removal","VI Peel"],"notes":"Bought 6-session laser package; sensitive skin history."},
+    {"id":"cus_1003","name":"Marcus Webb","email":"m.webb@email.com","phone":"(424) 555-0187","status":"VIP","lifetimeValue":1520,"lastVisit":"2025-05-05","nextAppointment":"2025-05-08 10:30","preferredServices":["Botox Forehead","Lip Filler Consultation"],"notes":"Prefers text confirmations and late morning appointments."},
+    {"id":"cus_1004","name":"Priya Sharma","email":"p.sharma@email.com","phone":"(310) 555-0212","status":"Regular","lifetimeValue":980,"lastVisit":"2025-05-08","nextAppointment":"2025-05-14 13:30","preferredServices":["VI Peel","Hydrafacial Classic"],"notes":"Asked for VI Peel aftercare reminders."},
+    {"id":"cus_1005","name":"Jordan Ellis","email":"j.ellis@email.com","phone":"(424) 555-0243","status":"Regular","lifetimeValue":850,"lastVisit":"2025-04-28","nextAppointment":"2025-05-08 15:00","preferredServices":["Microneedling + PRP"],"notes":"Interested in acne scar treatment plan."},
+    {"id":"cus_1006","name":"Alexa Monroe","email":"alexa.m@email.com","phone":"(310) 555-0298","status":"Regular","lifetimeValue":550,"lastVisit":"2025-04-24","nextAppointment":"2025-05-09 11:00","preferredServices":["Hydrafacial Platinum"],"notes":"Likes monthly facial reminders."},
+    {"id":"cus_1007","name":"Simone Laurent","email":"simone.l@email.com","phone":"(424) 555-0311","status":"Regular","lifetimeValue":680,"lastVisit":"2025-04-20","nextAppointment":"2025-05-08 18:30","preferredServices":["Laser Hair Underarms","Botox"],"notes":"Asked about package pricing."},
+    {"id":"cus_1008","name":"Devon Park","email":"devon.p@email.com","phone":"(310) 555-0356","status":"Regular","lifetimeValue":440,"lastVisit":"2025-04-15","nextAppointment":"2025-05-08 17:30","preferredServices":["Botox Crow's Feet"],"notes":"Prefers short appointments during lunch break."},
+    {"id":"cus_1009","name":"Rina Okafor","email":"rina.o@email.com","phone":"(424) 555-0389","status":"New","lifetimeValue":0,"lastVisit":null,"nextAppointment":"2025-05-12 11:00","preferredServices":["VI Peel"],"notes":"First med spa visit; send prep guide."},
+    {"id":"cus_1010","name":"Kai Tanaka","email":"kai.t@email.com","phone":"(310) 555-0412","status":"New","lifetimeValue":0,"lastVisit":null,"nextAppointment":"2025-05-13 14:30","preferredServices":["Hydrafacial Signature"],"notes":"Oily skin concerns; asked about Hydrafacial."}
+  ],
+  "appointments": [
+    {"id":"apt_2001","customer":"Isabelle Fontaine","service":"Hydrafacial Signature","date":"2025-05-08","time":"09:00","duration":60,"price":185,"status":"confirmed","source":"AI Chat"},
+    {"id":"apt_2002","customer":"Marcus Webb","service":"Botox — Forehead","date":"2025-05-08","time":"10:30","duration":45,"price":380,"status":"pending","source":"SMS"},
+    {"id":"apt_2003","customer":"Chloe Nakamura","service":"Laser Hair Removal — Full Legs","date":"2025-05-08","time":"12:00","duration":90,"price":320,"status":"confirmed","source":"Website"},
+    {"id":"apt_2004","customer":"Priya Sharma","service":"VI Peel","date":"2025-05-08","time":"13:30","duration":75,"price":260,"status":"checked_in","source":"AI Chat"},
+    {"id":"apt_2005","customer":"Jordan Ellis","service":"Microneedling + PRP","date":"2025-05-08","time":"15:00","duration":75,"price":425,"status":"confirmed","source":"Instagram DM"},
+    {"id":"apt_2006","customer":"Alexa Monroe","service":"Hydrafacial Platinum","date":"2025-05-08","time":"16:30","duration":90,"price":275,"status":"confirmed","source":"Website"},
+    {"id":"apt_2007","customer":"Devon Park","service":"Botox — Crow's Feet","date":"2025-05-08","time":"17:30","duration":30,"price":220,"status":"pending","source":"Phone"},
+    {"id":"apt_2008","customer":"Simone Laurent","service":"Laser Hair Removal — Underarms","date":"2025-05-08","time":"18:30","duration":45,"price":120,"status":"confirmed","source":"AI Chat"}
+  ],
+  "analytics": {
+    "monthlyRevenue": 33700,
+    "revenueGrowth": 22.4,
+    "bookingsThisMonth": 131,
+    "aiConversations": 412,
+    "leadConversionRate": 38.6,
+    "aiResponseRate": 96,
+    "averageReplyTimeSeconds": 38,
+    "noShowRate": 4.6,
+    "noShowReduction": 61,
+    "bookingSources": {"AI Chat":54,"Instagram DM":22,"Phone":13,"Referral":11},
+    "weeklyRevenue": [3200, 4100, 3900, 5200, 6100, 4800, 2400]
+  },
+  "conversations": [
+    {"customer":"Isabelle Fontaine","channel":"Website Chat","status":"booked","messages":["Hi! I want to book my usual Hydrafacial Signature for next week.","Of course! I have Friday May 16 at 9:00 AM or 1:30 PM available.","Friday 9am please!","Booked! See you Friday at 9:00 AM ✨"]},
+    {"customer":"Marcus Webb","channel":"SMS","status":"needs_staff","messages":["Can I add a lip filler consult after my Botox today?","Absolutely — I can add it at 12:30 PM after your Botox. Shall I confirm it?"]},
+    {"customer":"Rina Okafor","channel":"Instagram DM","status":"booked","messages":["I've never had a VI Peel. How much is it?","A VI Peel is $260 and takes about 75 minutes. It helps with texture, tone, and hyperpigmentation. Want to book a consultation?","Yes, next Monday?","Booked Monday May 12 at 11:00 AM. Welcome to GlowHaus! 💜"]}
+  ],
+  "invoices": [
+    {"id":"INV-2025-0508","date":"2025-05-08","plan":"Growth Plan","amount":149,"status":"paid"},
+    {"id":"INV-2025-0408","date":"2025-04-08","plan":"Growth Plan","amount":149,"status":"paid"},
+    {"id":"INV-2025-0308","date":"2025-03-08","plan":"Growth Plan","amount":149,"status":"paid"},
+    {"id":"INV-2025-0208","date":"2025-02-08","plan":"Starter Plan","amount":49,"status":"paid"}
+  ],
+  "notifications": [
+    {"type":"booking","title":"New booking confirmed","message":"Simone Laurent booked Laser Hair Removal — Underarms for today at 6:30 PM.","time":"2 min ago"},
+    {"type":"payment","title":"Payment received","message":"Chloe Nakamura's $320 deposit was successfully captured.","time":"14 min ago"},
+    {"type":"reminder","title":"Reminder sent","message":"24-hour reminder sent to Isabelle Fontaine for Hydrafacial Signature.","time":"31 min ago"},
+    {"type":"review","title":"New 5-star review","message":"Isabelle left a 5-star Google review: 'Best Hydrafacial I've ever had.'","time":"1 hr ago"}
+  ],
+  "activityLogs": [
+    {"time":"11:53 PM","event":"AI booked Sophie Kim","detail":"Full Highlights · Saturday 10:00 AM · $180 via Instagram DM"},
+    {"time":"10:12 PM","event":"After-hours inquiry handled","detail":"Customer asked for business hours and was offered booking slots"},
+    {"time":"9:30 PM","event":"Reminder sent","detail":"Cut & Blowout reminder delivered to Mia Torres"},
+    {"time":"7:15 PM","event":"Missed lead recovered","detail":"Follow-up converted a website visitor into a consultation booking"}
+  ],
+  "aiResponses": [
+    {"scenario":"appointment request","reply":"Hi Sophie! We’d love to get you booked. For Full Highlights, I have Saturday at 10:00 AM or 1:00 PM available. The service is $180 and takes about 2.5 hours. Which time works best for you?"},
+    {"scenario":"price question","reply":"Great question! Our Hydrafacial options start at $155 for Classic, $185 for Signature, and $275 for Platinum. Each includes cleansing, exfoliation, extraction, and hydration. Would you like me to check availability?"},
+    {"scenario":"reschedule request","reply":"Of course — no problem at all. I can help move your appointment. I have Tuesday at 2:00 PM, Wednesday at 11:30 AM, or Friday at 9:00 AM available. Which works best?"},
+    {"scenario":"review request","reply":"Hi Isabelle! We hope you’re glowing after your Hydrafacial today. If you have a moment, we’d be grateful for a quick Google review — it helps our small team so much. Thank you for choosing GlowHaus!"}
+  ]
+}

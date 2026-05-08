@@ -1,0 +1,13 @@
+/                  /index.html                200
+/login             /autobook-auth.html        200
+/signup            /autobook-auth.html        200
+/app               /autobook-production.html  200
+/dashboard         /autobook-ai.html          200
+/billing           /autobook-billing.html     200
+/analytics         /analytics-dashboard.html  200
+/settings          /settings-admin.html       200
+/demo/salon        /salon-demo.html           200
+/demo              /salon-demo.html           200
+
+# Fallback for unknown routes
+/*                 /index.html                200

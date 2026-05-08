@@ -1,0 +1,60 @@
+/* Navigation Enhancements */
+nav.nav {
+  position: sticky;
+  top: 0;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px); /* Safari support */
+  background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  z-index: 1000;
+}
+
+/* Global Smooth Scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Zebra-striping for sections */
+section:nth-of-type(even) {
+  background-color: #f9fafb;
+}
+
+/* Accessibility: darker gray text */
+:root {
+  --muted: #595959;
+  --mu: #595959;
+}
+
+:where(p, small, .lead, .hero-sub, .trust, .field label, .card-sub, .kpi-label, .mini span, .footer, .usub, .tmut, .muted) {
+  color: #595959;
+}
+
+/* Responsiveness: flex container safety */
+:where(.flex, .nav, .nav-inner, .nav-links, .nav-actions, .hero-ctas, .trust, .top, .top-actions, .logo, .mobile, .footer, [style*="display:flex"]) {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+:where(.hero-ctas, .trust, .nav, .top, .footer, .mobile) {
+  padding-inline: clamp(12px, 3vw, 24px);
+}
+
+/* Hero Layout Fixes */
+header.hero {
+  height: auto;
+  min-height: 100vh; /* Or your preferred minimum height */
+}
+
+.hero-ctas {
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+/* Button UX Improvements */
+.hero-ctas button {
+  height: 48px;
+  padding: 0 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
