@@ -1,4 +1,3 @@
-import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe/client';
@@ -19,6 +18,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Plan pricing not configured' }, { status: 400 });
     }
 
+    const { createServerClient } = await import('@supabase/ssr');
     const cookieStore = cookies();
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || 'https://placeholder.supabase.co',

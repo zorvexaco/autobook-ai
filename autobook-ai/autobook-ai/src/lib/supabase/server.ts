@@ -1,35 +1,46 @@
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
-export async function createClient() {
-  const cookieStore = await cookies();
-
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || 'https://placeholder.supabase.co',
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || 'placeholder-anon-key',
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(
-          cookiesToSet: {
-            name: string;
-            value: string;
-            options: CookieOptions;
-          }[]
-        ) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {
-            // The `setAll` method is called from a Server Component where
-            // cookies cannot be set. This can be safely ignored when the
-            // middleware refreshes the session.
-          }
-        },
-      },
-    }
+function getUrl(): string {
+  return (
+    process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    process.env.SUPABASE_URL ||
+    "https://placeholder.supabase.co"
   );
+}
+
+function getKey(): string {
+  return (
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    process.env.SUPABASE_ANON_KEY ||
+    "placeholder-anon-key"
+  );
+}
+
+/**
+ * Creates a Supabase server client with cookie-based auth.
+ * Dynamically imports @supabase/ssr to avoid module-level
+ * validation crashes during static page generation.
+ */
+export async function createServerSupabase() {
+  const { createServerClient } = await import("@supabase/ssr");
+  const cookieStore = cookies();
+
+  return createServerClient(getUrl(), getKey(), {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll();
+      },
+      setAll(
+        cookiesToSet: { name: string; value: string; options?: any }[]
+      ) {
+        try {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          );
+        } catch {
+          // Cannot set cookies from Server Components
+        }
+      },
+    },
+  });
 }

@@ -1,35 +1,30 @@
-import { createServerClient } from '@supabase/ssr';
+import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export async function middleware(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
+function getSupabaseUrl(): string {
+  return process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || 'https://placeholder.supabase.co';
+}
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || 'https://placeholder.supabase.co',
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || 'placeholder-anon-key',
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet: { name: string; value: string; options?: any }[]) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            request.cookies.set(name, value)
-          );
-          supabaseResponse = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
-        },
-      },
+function getSupabaseKey(): string {
+  return process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || 'placeholder-anon-key';
+}
+
+function getAccessTokenFromCookies(request: NextRequest): string | null {
+  const allCookies = request.cookies.getAll();
+  for (const cookie of allCookies) {
+    if (cookie.name.startsWith('sb-') && cookie.name.endsWith('-auth-token')) {
+      try {
+        const parsed = JSON.parse(cookie.value);
+        if (Array.isArray(parsed) && parsed[0]) return parsed[0];
+        if (typeof parsed === 'string') return parsed;
+      } catch {}
     }
-  );
+  }
+  return null;
+}
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   // Public routes - no auth needed
@@ -37,18 +32,35 @@ export async function middleware(request: NextRequest) {
   const isPublicRoute = publicRoutes.some((route) => path === route || path.startsWith('/api/webhooks'));
 
   if (isPublicRoute) {
-    return supabaseResponse;
+    return NextResponse.next();
   }
 
-  // Not authenticated - redirect to login
-  if (!user) {
+  // Read auth token from cookies
+  const accessToken = getAccessTokenFromCookies(request);
+
+  if (!accessToken) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     url.searchParams.set('redirect', path);
     return NextResponse.redirect(url);
   }
 
-  // Check if user needs onboarding (except if already on onboarding page)
+  // Verify user with Supabase
+  const supabase = createClient(getSupabaseUrl(), getSupabaseKey(), {
+    auth: { persistSession: false, autoRefreshToken: false },
+    global: { headers: { Authorization: `Bearer ${accessToken}` } },
+  });
+
+  const { data: { user }, error } = await supabase.auth.getUser();
+
+  if (error || !user) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/login';
+    url.searchParams.set('redirect', path);
+    return NextResponse.redirect(url);
+  }
+
+  // Check if user needs onboarding
   if (path !== '/onboarding' && path.startsWith('/dashboard')) {
     const { data: business } = await supabase
       .from('businesses')
@@ -63,7 +75,6 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // User is on onboarding but already completed - redirect to dashboard
   if (path === '/onboarding') {
     const { data: business } = await supabase
       .from('businesses')
@@ -78,14 +89,13 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Authenticated users trying to access login/signup - redirect to dashboard
   if (path === '/login' || path === '/signup') {
     const url = request.nextUrl.clone();
     url.pathname = '/dashboard';
     return NextResponse.redirect(url);
   }
 
-  return supabaseResponse;
+  return NextResponse.next();
 }
 
 export const config = {
