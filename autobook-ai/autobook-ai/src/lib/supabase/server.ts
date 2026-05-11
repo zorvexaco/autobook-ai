@@ -2,16 +2,16 @@ import { cookies } from "next/headers";
 
 function getUrl(): string {
   return (
-    process.env.NEXT_PUBLIC_SUPABASE_URL ||
     process.env.SUPABASE_URL ||
+    process.env.NEXT_PUBLIC_SUPABASE_URL ||
     "https://placeholder.supabase.co"
   );
 }
 
 function getKey(): string {
   return (
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
     process.env.SUPABASE_ANON_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
     "placeholder-anon-key"
   );
 }
